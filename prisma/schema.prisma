@@ -1,0 +1,86 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum FileType {
+  file
+  folder
+}
+
+model User {
+  id                    String   @id @default(uuid())
+  publicKey             String   @unique
+  storageBytesAvailable Int      @default(0)
+  storageUsed           Int      @default(0)
+  verified              Boolean  @default(false)
+  fileEntries           FileEntry[]
+  ownedShares           FileShare[] @relation("Owner")
+  receivedShares        FileShare[] @relation("SharedWith")
+  purchases             Purchase[]
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([publicKey])
+}
+
+model FileEntry {
+  id                String   @id @default(uuid())
+  name              String
+  type              FileType
+  ownerPK           String
+  folderId          String?  
+  size              Int?
+  mimeType          String?  
+  url               String?
+  encryptionKey     String?
+  metadata          Json?
+  isPrivate         Boolean  @default(false)
+  isPubliclyShared  Boolean  @default(false)
+  publicShareId     String?  @unique
+  deleted           Boolean  @default(false)
+  uploadedSize      Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  owner             User     @relation(fields: [ownerPK], references: [publicKey])
+  parent            FileEntry?  @relation("ParentChild", fields: [folderId], references: [id])
+  children          FileEntry[] @relation("ParentChild")
+  shares            FileShare[]
+
+  @@index([ownerPK])
+  @@index([folderId])
+  @@index([type])
+  @@index([publicShareId])
+}
+
+model FileShare {
+  id            String   @id @default(uuid())
+  fileEntryId   String
+  ownerPK       String
+  sharedWithPK  String
+  permission    String
+  createdAt     DateTime @default(now())
+  fileEntry     FileEntry @relation(fields: [fileEntryId], references: [id])
+  owner         User     @relation("Owner", fields: [ownerPK], references: [publicKey])
+  sharedWith    User?    @relation("SharedWith", fields: [sharedWithPK], references: [publicKey])
+
+  @@index([fileEntryId])
+  @@index([ownerPK])
+  @@index([sharedWithPK])
+}
+
+model Purchase {
+  id            String   @id @default(uuid())
+  userPK        String
+  storageBytes  Int
+  status        String
+  transactionId String
+  purchaseDate  DateTime @default(now())
+  user          User     @relation(fields: [userPK], references: [publicKey])
+
+  @@index([userPK])
+}

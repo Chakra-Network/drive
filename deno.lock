@@ -1,0 +1,140 @@
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "jsr:@luca/esbuild-deno-loader@^0.10.3": "jsr:@luca/esbuild-deno-loader@0.10.3",
+      "jsr:@std/assert@^0.213.1": "jsr:@std/assert@0.213.1",
+      "jsr:@std/encoding@0.213": "jsr:@std/encoding@0.213.1",
+      "jsr:@std/jsonc@0.213": "jsr:@std/jsonc@0.213.1",
+      "jsr:@std/path@0.213": "jsr:@std/path@0.213.1"
+    },
+    "jsr": {
+      "@luca/esbuild-deno-loader@0.10.3": {
+        "integrity": "32fc93f7e7f78060234fd5929a740668aab1c742b808c6048b57f9aaea514921",
+        "dependencies": [
+          "jsr:@std/encoding@0.213",
+          "jsr:@std/jsonc@0.213",
+          "jsr:@std/path@0.213"
+        ]
+      },
+      "@std/assert@0.213.1": {
+        "integrity": "24c28178b30c8e0782c18e8e94ea72b16282207569cdd10ffb9d1d26f2edebfe"
+      },
+      "@std/encoding@0.213.1": {
+        "integrity": "fcbb6928713dde941a18ca5db88ca1544d0755ec8fb20fe61e2dc8144b390c62"
+      },
+      "@std/jsonc@0.213.1": {
+        "integrity": "5578f21aa583b7eb7317eed077ffcde47b294f1056bdbb9aacec407758637bfe",
+        "dependencies": [
+          "jsr:@std/assert@^0.213.1"
+        ]
+      },
+      "@std/path@0.213.1": {
+        "integrity": "f187bf278a172752e02fcbacf6bd78a335ed320d080a7ed3a5a59c3e88abc673",
+        "dependencies": [
+          "jsr:@std/assert@^0.213.1"
+        ]
+      }
+    }
+  },
+  "remote": {
+    "https://deno.land/x/denoflate@1.2.1/mod.ts": "f5628e44b80b3d80ed525afa2ba0f12408e3849db817d47a883b801f9ce69dd6",
+    "https://deno.land/x/denoflate@1.2.1/pkg/denoflate.js": "b9f9ad9457d3f12f28b1fb35c555f57443427f74decb403113d67364e4f2caf4",
+    "https://deno.land/x/denoflate@1.2.1/pkg/denoflate_bg.wasm.js": "d581956245407a2115a3d7e8d85a9641c032940a8e810acbd59ca86afd34d44d",
+    "https://deno.land/x/esbuild@v0.20.1/mod.js": "d50e500b53ce67e31116beba3916b0f9275c0e1cc20bc5cadc0fc1b7a3b06fd9"
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@irys/sdk@^0.2.11",
+        "npm:@irys/upload-core@^0.0.5",
+        "npm:@irys/web-upload-solana@^0.0.8",
+        "npm:@irys/web-upload@^0.0.7",
+        "npm:@lit-protocol/auth-helpers@^6.7.0",
+        "npm:@lit-protocol/constants@^6.7.0",
+        "npm:@lit-protocol/contracts-sdk@^6.7.0",
+        "npm:@lit-protocol/lit-node-client-nodejs@^6.7.0",
+        "npm:@lit-protocol/lit-node-client@^6.5.3",
+        "npm:@lit-protocol/types@^6.7.0",
+        "npm:@prisma/client@^5.20.0",
+        "npm:@radix-ui/react-alert-dialog@^1.1.1",
+        "npm:@radix-ui/react-dropdown-menu@^2.1.1",
+        "npm:@radix-ui/react-icons@^1.3.0",
+        "npm:@radix-ui/react-label@^2.1.0",
+        "npm:@radix-ui/react-progress@^1.1.0",
+        "npm:@radix-ui/react-radio-group@^1.2.0",
+        "npm:@radix-ui/react-slider@^1.2.0",
+        "npm:@radix-ui/react-slot@^1.1.0",
+        "npm:@radix-ui/react-switch@^1.1.0",
+        "npm:@radix-ui/react-toggle-group@^1.1.0",
+        "npm:@radix-ui/react-toggle@^1.1.0",
+        "npm:@solana/spl-token@^0.4.8",
+        "npm:@solana/wallet-adapter-base@^0.9.23",
+        "npm:@solana/wallet-adapter-react-ui@^0.9.35",
+        "npm:@solana/wallet-adapter-react@^0.15.35",
+        "npm:@solana/wallet-adapter-wallets@^0.19.32",
+        "npm:@solana/wallet-standard-chains@^1.1.0",
+        "npm:@solana/wallet-standard-util@^1.1.1",
+        "npm:@solana/web3.js@^1.95.3",
+        "npm:@t3-oss/env-nextjs@^0.11.1",
+        "npm:@tanstack/react-query@^5.56.2",
+        "npm:@types/async-retry@^1.4.8",
+        "npm:@types/bcrypt@^5.0.2",
+        "npm:@types/bytes@^3.1.4",
+        "npm:@types/dotenv@^6.1.1",
+        "npm:@types/jsonwebtoken@^9.0.6",
+        "npm:@types/node@^20.16.5",
+        "npm:@types/react-dom@^18",
+        "npm:@types/react@^18",
+        "npm:@typescript-eslint/eslint-plugin@^7.18.0",
+        "npm:@typescript-eslint/parser@^7.18.0",
+        "npm:async-retry@^1.3.3",
+        "npm:autoprefixer@^10.4.20",
+        "npm:axios@^1.7.7",
+        "npm:bcrypt@^5.1.1",
+        "npm:bigint-buffer@^1.1.5",
+        "npm:bignumber.js@^9.1.2",
+        "npm:bs58@^6.0.0",
+        "npm:bytes@^3.1.2",
+        "npm:class-variance-authority@^0.7.0",
+        "npm:classnames@^2.5.1",
+        "npm:clsx@^2.1.1",
+        "npm:dayjs@^1.11.13",
+        "npm:dotenv@^16.4.5",
+        "npm:eslint-config-airbnb-typescript@^18.0.0",
+        "npm:eslint-config-airbnb@^19.0.4",
+        "npm:eslint-config-next@^14.2.8",
+        "npm:eslint-config-prettier@^9.1.0",
+        "npm:eslint-plugin-import@^2.30.0",
+        "npm:eslint-plugin-jsx-a11y@^6.10.0",
+        "npm:eslint-plugin-prettier@^5.2.1",
+        "npm:eslint-plugin-react-hooks@^4.6.2",
+        "npm:eslint-plugin-react@^7.35.2",
+        "npm:eslint@^8.57.0",
+        "npm:ethers@^5.7.2",
+        "npm:form-data@^4.0.0",
+        "npm:i@^0.3.7",
+        "npm:ipfs-only-hash@^4.0.0",
+        "npm:jsonwebtoken@^9.0.2",
+        "npm:lucide-react@^0.439.0",
+        "npm:next-plausible@^3.12.2",
+        "npm:next@^13.5.6",
+        "npm:postcss@^8.4.47",
+        "npm:prisma@^5.20.0",
+        "npm:raw-loader@^4.0.2",
+        "npm:react-dom@^18",
+        "npm:react-markdown@^9.0.1",
+        "npm:react@^18",
+        "npm:tailwind-merge@^2.5.2",
+        "npm:tailwindcss-animate@^1.0.7",
+        "npm:tailwindcss@^3.4.12",
+        "npm:ts-node@^10.9.2",
+        "npm:tweetnacl@^1.0.3",
+        "npm:typescript@^5.6.2",
+        "npm:typestub-ipfs-only-hash@^4.0.0",
+        "npm:uuid@^10.0.0",
+        "npm:zod@^3.23.8"
+      ]
+    }
+  }
+}

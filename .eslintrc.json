@@ -1,0 +1,30 @@
+{
+  "extends": [
+    "airbnb",
+    "airbnb-typescript",
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint", "react", "prettier"],
+  "rules": {
+    "react/require-default-props": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-props-no-spreading": "off",
+    "import/prefer-default-export": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "prettier/prettier": ["error", {}, { "usePrettierrc": true }],
+    "no-console": "off",
+    "no-plusplus": "off",
+    "no-bitwise": "off",
+    "import/no-webpack-loader-syntax": "off",
+    "react/function-component-definition": "off"
+  }
+}
