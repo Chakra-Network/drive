@@ -1,15 +1,23 @@
 import Notification from '@/app/components/common/Notification';
 import Popup from '@/app/components/common/Popup';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/app/components/ui/dialog';
+import { ScrollArea } from '@/app/components/ui/scroll-area';
 import apiClient from '@/lib/api-client';
 import { storeSIWSMessage } from '@/lib/auth';
 import { createSiwsInput } from '@/lib/utils';
-import { usePathname } from 'next/navigation';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { createSignInMessage } from '@solana/wallet-standard-util';
 import { useWalletModal } from '@tiplink/wallet-adapter-react-ui';
 import bs58 from 'bs58';
 import { Loader2 } from 'lucide-react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 type AuthStatus = 'authenticated' | 'unauthenticated' | 'rejected';
 
@@ -20,6 +28,97 @@ type AuthContextType = {
   currentPublicKey: string | null;
   triggerAuth: () => Promise<void>;
   logout: () => void;
+};
+
+const TermsAndConditions = () => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <span className="text-blue-500 cursor-pointer hover:underline text-black">
+          Terms and Conditions
+        </span>
+      </DialogTrigger>
+      <DialogContent className="flex flex-col p-0 text-black">
+        <DialogHeader className="p-4 pb-2">
+          <DialogTitle className="text-lg font-semibold">Terms and Conditions</DialogTitle>
+          <p className="text-xs text-gray-500">
+            Please read these terms carefully before using Chakra Drive.
+          </p>
+        </DialogHeader>
+        <ScrollArea className="flex-grow px-4 pb-4">
+          <div className="space-y-2 text-xs">
+            <p>
+              Welcome to Chakra Drive, a service that allows direct file uploads to the Irys data
+              chain. By using our service, you agree to the following terms:
+            </p>
+
+            <h3 className="font-bold">1. Data Permanence</h3>
+            <ul className="list-disc pl-4 space-y-1">
+              <li>
+                Once uploaded, storage cannot be reclaimed. Files will remain on the Irys chain
+                indefinitely.
+              </li>
+              <li>
+                For public uploads, files will be accessible forever, even if &ldquo;deleted&rdquo;
+                from your Chakra Drive interface.
+              </li>
+              <li>
+                When a public file is &ldquo;deleted,&rdquo; it will still exist on the Irys chain.
+                The file space will continue to be shown in your storage indicator.
+              </li>
+            </ul>
+
+            <h3 className="font-bold">2. Privacy and Sharing</h3>
+            <ul className="list-disc pl-4 space-y-1">
+              <li>Private uploads cannot be shared.</li>
+              <li>
+                Public uploads will be permanently accessible, even after deletion from your Chakra
+                Drive interface.
+              </li>
+            </ul>
+
+            <h3 className="font-bold">3. Content Responsibility</h3>
+            <ul className="list-disc pl-4 space-y-1">
+              <li>
+                Chakra Labs Inc is not responsible for content posted on Chakra Drive. All data is
+                posted directly to the Irys chain.
+              </li>
+              <li>
+                Any content{' '}
+                <a
+                  href="https://hackmd.io/@mBbfLZ3iSX6d_bN-u5OBpw/rkwLsBWJJe"
+                  target="_blank"
+                  style={{ textDecoration: 'underline', textDecorationColor: 'currentColor' }}
+                  // eslint-disable-next-line
+                  onMouseEnter={(e: any) => (e.target.style.textDecoration = 'none')}
+                  // eslint-disable-next-line
+                  onMouseLeave={(e: any) => (e.target.style.textDecoration = 'underline')}
+                >
+                  takedown requests
+                </a>{' '}
+                should be directed to the Irys team.
+              </li>
+            </ul>
+
+            <h3 className="font-bold">4. Service Level Agreement and Liability</h3>
+            <ul className="list-disc pl-4 space-y-1">
+              <li>
+                Chakra Drive makes no guarantees regarding service level agreements (SLAs) and
+                cannot be held liable for any outages or otherwise.
+              </li>
+              <li>
+                By signing the authentication message, you agree that you will not hold Chakra Labs
+                Inc, its affiliates, officers, directors, employees, or agents liable for any
+                direct, indirect, incidental, special, consequential or exemplary damages, including
+                but not limited to, damages for loss of profits, goodwill, use, data or other
+                intangible losses resulting from the use of or inability to use the service.
+              </li>
+            </ul>
+          </div>
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  );
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -139,7 +238,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [publicKey, currentPublicKey, logout, triggerAuth]);
 
   useEffect(() => {
-    checkAuthStatus().then(() => setLoading(false));
+    checkAuthStatus().then(async () => {
+      await new Promise(resolve => {
+        setTimeout(resolve, 200);
+      });
+      setLoading(false);
+    });
   }, [checkAuthStatus]);
 
   useEffect(() => {
@@ -165,10 +269,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider value={contextValue}>
       {children}
-      {status === 'unauthenticated' && !isPublicFileRoute() && (
+      {((status === 'unauthenticated' && !isPublicFileRoute()) || loading) && (
         <Popup zIndex={50} alignItems="center" onClose={() => null}>
           <div className="flex flex-col items-center gap-4 p-8 bg-white rounded-lg">
-            {!loading && status === 'unauthenticated' ? (
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin text-green-500" />
+                <div className="text-sm text-gray-500">Loading...</div>
+              </div>
+            ) : (
               <>
                 <div className="text-2xl font-semibold text-[#142A1D]">
                   {!connectedButNotAuthenticated ? 'Connect Wallet' : 'Prove Ownership'}
@@ -178,7 +287,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     ? 'Select wallet to continue using Chakra Drive'
                     : 'You must prove you own the wallet to continue'}
                 </div>
-                <div className="flex flex-row gap-4">
+                {connectedButNotAuthenticated && (
+                  <div className="text-sm text-gray-700 text-center">
+                    By signing, you acknowledge and accept the <TermsAndConditions />.
+                  </div>
+                )}
+                <div className="flex flex-row gap-4 mt-4">
                   <button
                     type="button"
                     onClick={() => setStatus('rejected')}
@@ -192,6 +306,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                       if (!publicKey) {
                         setVisible(true);
                       } else {
+                        setLoading(true);
                         triggerAuth();
                       }
                     }}
@@ -201,11 +316,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   </button>
                 </div>
               </>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin text-green-500" />
-                <div className="text-sm text-gray-500">Loading...</div>
-              </div>
             )}
           </div>
         </Popup>

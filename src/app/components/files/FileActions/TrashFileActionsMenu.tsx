@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Trash, EllipsisVertical, ArchiveRestore } from 'lucide-react';
+import DeleteFile from '@/app/components/common/DeleteFile';
 import { Button } from '@/app/components/ui/button';
 import {
   DropdownMenu,
@@ -7,10 +6,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/app/components/ui/dropdown-menu';
-import { FileEntryResponse } from '@/types';
-import DeleteFile from '@/app/components/common/DeleteFile';
-import apiClient from '@/lib/api-client';
 import { useNotification } from '@/context/notification';
+import apiClient from '@/lib/api-client';
+import { FileEntryResponse } from '@/types';
+import { ArchiveRestore, EllipsisVertical, Trash } from 'lucide-react';
+import React, { useState } from 'react';
 
 interface TrashFileActionsMenuProps {
   file: FileEntryResponse;
@@ -68,7 +68,7 @@ export default function TrashFileActionsMenu({ file, setVisibleFiles }: TrashFil
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon">
-            <EllipsisVertical className="h-5 w-6" />
+            <EllipsisVertical className="h-5 w-6 text-[#707D75]" />
             <span className="sr-only">Open file actions menu</span>
           </Button>
         </DropdownMenuTrigger>

@@ -22,6 +22,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'gateway.irys.xyz',
       },
+      {
+        protocol: 'https',
+        hostname: 'drive.chakra.network',
+      },
     ],
   },
   async rewrites() {
@@ -31,6 +35,45 @@ const nextConfig = {
         destination: 'https://gateway.irys.xyz/:path*',
       },
     ];
+  },
+  async headers() {
+    return [
+      {
+        source: '/share/:publicShareId',
+        headers: [
+          {
+            key: 'User-Agent',
+            value: '(.*Twitterbot.*)',
+          },
+        ],
+      },
+      // Add security headers
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+        ],
+      },
+    ];
+  },
+  // Ensure static files are served correctly
+  publicRuntimeConfig: {
+    staticFolder: '/public',
   },
 };
 

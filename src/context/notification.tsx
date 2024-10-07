@@ -17,16 +17,28 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [notification, setNotificationState] = useState<NotificationParams | undefined>(undefined);
+  const [visible, setVisible] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (!visible) {
+      const timeout = setTimeout(() => {
+        setNotificationState(undefined);
+      }, 1000);
+      return () => clearTimeout(timeout);
+    }
+    return undefined;
+  }, [visible]);
 
   useEffect(() => {
     if (notification) {
+      setVisible(true);
       const timeout = setTimeout(() => {
-        setNotificationState(undefined);
+        setVisible(false);
       }, 5000);
 
       return () => clearTimeout(timeout);
     }
-    return undefined; // Explicit return for the linter
+    return undefined;
   }, [notification]);
 
   const setNotification = useCallback((params: NotificationParams) => {
@@ -43,6 +55,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
           title={notification.title}
           message={notification.message}
           type={notification.type}
+          visible={visible}
         />
       )}
     </NotificationContext.Provider>

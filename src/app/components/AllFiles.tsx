@@ -58,14 +58,14 @@ function HoverUploadDropdown({
     >
       <button
         type="button"
-        className="flex items-center justify-center px-4 py-2.5 bg-header-green text-white rounded-md hover:bg-[#1d3f2a] focus:outline-none focus:ring-2 focus:ring-header-green focus:ring-opacity-50 transition-colors"
+        className="flex items-center justify-center px-4 py-2.5 bg-black text-white rounded-md hover:bg-[#1d3f2a] focus:outline-none focus:ring-2 focus:ring-header-green focus:ring-opacity-50 transition-colors"
       >
         <FileUpIcon size={20} className="mr-2" />
         <span>Upload File</span>
       </button>
       {isHovering && (
         <div
-          className="absolute left-0 mt-1 bg-header-green text-white rounded-md shadow-lg z-10 w-full"
+          className="absolute left-0 mt-1 bg-black text-white rounded-md shadow-lg z-10 w-full"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
@@ -373,7 +373,7 @@ export default function AllFiles({ path }: { path: string | string[] | undefined
 
   if (status === 'unauthenticated' || !currentPublicKey) {
     return (
-      <DelayedComponent delay={0}>
+      <DelayedComponent delay={500} className="w-full h-full">
         <div className="flex flex-col items-center justify-center h-full">
           <p className="mb-4 text-black">
             Please connect your wallet and authenticate to view your files.
@@ -385,9 +385,12 @@ export default function AllFiles({ path }: { path: string | string[] | undefined
 
   if (status === 'authenticated' && isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
+      <DelayedComponent
+        delay={400}
+        className="w-full h-full items-center justify-center mx-auto flex"
+      >
         <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
+      </DelayedComponent>
     );
   }
 
@@ -406,9 +409,9 @@ export default function AllFiles({ path }: { path: string | string[] | undefined
       <div className="pt-4 w-full">
         <Breadcrumbs path={breadcrumbPath} />
       </div>
-      <div className="pt-4 w-full h-[85%]">
+      <div className="pt-4 w-full h-full">
         {!isMobile && (
-          <div className="flex flex-row justify-between">
+          <div className="flex flex-row justify-between py-4">
             <div className="flex flex-row gap-2">
               {env.NEXT_PUBLIC_ENABLE_PRIVATE_FILE_UPLOAD ? (
                 <HoverUploadDropdown
@@ -423,7 +426,7 @@ export default function AllFiles({ path }: { path: string | string[] | undefined
                     setIsPrivateUpload(false);
                     fileInputRef.current?.click();
                   }}
-                  className="flex items-center justify-center px-4 py-2 bg-header-green text-white rounded-md hover:bg-[#1d3f2a] focus:outline-none focus:ring-2 focus:ring-header-green focus:ring-opacity-50 transition-colors"
+                  className="flex items-center justify-center px-4 py-2 bg-header-black text-white rounded-md hover:bg-[#1d3f2a] focus:outline-none focus:ring-2 focus:ring-header-green focus:ring-opacity-50 transition-colors"
                 >
                   <FileUpIcon size={24} />
                   <span className="mx-2">Upload File</span>

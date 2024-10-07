@@ -1,11 +1,12 @@
+import ClientLayout from '@/app/components/ClientLayout';
 import '@/app/globals.css';
+import { DeviceProvider } from '@/context/device';
+import { NotificationProvider } from '@/context/notification';
+import { getBaseUrl } from '@/lib/utils';
 import type { Metadata } from 'next';
 import PlausibleProvider from 'next-plausible';
 import { Sora } from 'next/font/google';
 import localFont from 'next/font/local';
-import ClientLayout from '@/app/components/ClientLayout';
-import { NotificationProvider } from '@/context/notification';
-import { DeviceProvider } from '@/context/device';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -21,6 +22,7 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: 'Chakra Drive',
   description: 'Powered by Irys',
+  metadataBase: new URL(getBaseUrl()),
 };
 
 const sora = Sora({ subsets: ['latin'] });

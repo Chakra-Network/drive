@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
-import { useNotification } from '@/context/notification';
-import { Connection, PublicKey } from '@solana/web3.js';
-import { createTipTransaction, sendTipTransaction } from '@/lib/solana';
 import { env } from '@/app/utils/env';
+import { useNotification } from '@/context/notification';
+import { createTipTransaction, sendTipTransaction } from '@/lib/solana';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { Connection, PublicKey } from '@solana/web3.js';
+import { useState } from 'react';
 
 interface TipButtonProps {
   fileId: string;
@@ -65,7 +65,7 @@ export default function TipButton({ fileId, fileName, recipientPublicKey }: TipB
   };
 
   return (
-    <div className="bg-gray-100 p-4 rounded-lg">
+    <div className="text-black pt-4 rounded-lg">
       <h3 className="text-lg font-semibold mb-2">Send a tip for &ldquo;{fileName}&rdquo;</h3>
       <p className="text-sm text-gray-600 mb-4">
         Choose an amount or enter a custom tip for the creator of this file.

@@ -2,6 +2,7 @@
 
 import AddStorage from '@/app/components/AddStorage';
 import SearchInput from '@/app/components/SearchInput';
+import { Button } from '@/app/components/ui/button';
 import { WalletMultiButton } from '@/app/components/wallet_connect_button/WalletMultiButton';
 import { GlobalStateProvider, useGlobalState } from '@/app/hooks/useGlobalState';
 import { env } from '@/app/utils/env';
@@ -19,8 +20,18 @@ import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-quer
 import { TipLinkWalletAdapter } from '@tiplink/wallet-adapter';
 import { DefaultTipLinkWalletModalProvider } from '@tiplink/wallet-adapter-react-ui';
 import bytes from 'bytes';
-import { AlignJustify, Files, LucideIcon, Trash2 as Trash, Users, X } from 'lucide-react';
+import {
+  AlignJustify,
+  Files,
+  Github,
+  LucideIcon,
+  Trash2 as Trash,
+  Twitter,
+  Users,
+  X,
+} from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -65,7 +76,7 @@ function Header({ title, fileCount = 0 }: { title: string; fileCount?: number })
         {!isMobile && <WalletMultiButton className="flex-shrink-0" />}
         {isMobile && (
           <Image
-            onClick={() => window.open('https://x.com/chakra_ai', '_blank')}
+            onClick={() => window.open('https://www.chakra.network/', '_blank')}
             src="/chakra_icon.png"
             alt="logo"
             width={45}
@@ -99,6 +110,24 @@ function SidebarLabel({
   );
 }
 
+const SocialLinks = () => {
+  return (
+    <div className="mt-auto mb-4 flex justify-start space-x-4 px-4">
+      <Link href="https://twitter.com/chakra_ai" target="_blank" rel="noopener noreferrer" passHref>
+        <Twitter className="h-5 w-5 text-gray-500 hover:text-gray-900 cursor-pointer" />
+      </Link>
+      <Link
+        href="https://github.com/chakra-Network/drive"
+        target="_blank"
+        rel="noopener noreferrer"
+        passHref
+      >
+        <Github className="h-5 w-5 text-gray-500 hover:text-gray-900 cursor-pointer" />
+      </Link>
+    </div>
+  );
+};
+
 function AppWithSidebar({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -116,7 +145,7 @@ function AppWithSidebar({ children }: { children: React.ReactNode }) {
     setSearchInput('');
   }, [pathname, setSearchInput]);
 
-  const { data: storageUsedBytes } = useQuery({
+  const { data: storageUsedBytes, isLoading } = useQuery({
     queryKey: ['storageInfo', currentPublicKey],
     queryFn: async () => {
       const response = await apiClient.user.getStorage();
@@ -266,10 +295,11 @@ function AppWithSidebar({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               onClick={handleUpgradePlan}
-              className="btn-primary mx-4 font-semibold !bg-green-500"
+              className="btn-primary mx-4 font-semibold"
             >
               <span className="w-full text-center">Add Storage</span>
             </button>
+            <SocialLinks />
           </div>
         </div>
         <div className="flex flex-col p-4 w-full bg-white">
@@ -284,12 +314,12 @@ function AppWithSidebar({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen h-full w-full">
+    <div className="flex h-screen w-full">
       <div className="bg-white">
         <div className="flex flex-col w-[250px] h-full bg-[#142A1D0A] px-4 rounded-r-3xl">
           <a
             className="flex items-center justify-center py-4 gap-4"
-            href="https://x.com/chakra_ai"
+            href="https://www.chakra.network/"
             target="_blank"
             rel="noreferrer"
           >
@@ -303,7 +333,7 @@ function AppWithSidebar({ children }: { children: React.ReactNode }) {
               onClick={() => handleSidebarClick(index)}
             />
           ))}
-          {totalStorageAvailableBytes > 0 && (
+          {!isLoading && (
             <div className="flex flex-col w-full px-4 py-2">
               <div className="flex flex-row justify-between text-secondary rounded-lg mb-1 gap-1 text-sm font-semibold">
                 <div className="flex flex-row gap-2 items-center whitespace-nowrap">
@@ -330,16 +360,18 @@ function AppWithSidebar({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           )}
-          <button
-            type="button"
+          <Button
+            className="mx-3 mt-2 btn-primary font-semibold"
+            variant="outline"
             onClick={handleUpgradePlan}
-            className="btn-primary mx-4 font-semibold !bg-green-500"
           >
-            <span className="w-full text-center">Add Storage</span>
-          </button>
+            Add Storage
+          </Button>
+
+          <SocialLinks />
         </div>
       </div>
-      <div className="flex flex-col p-4 w-full bg-white">
+      <div className="p-4 w-full bg-white h-[100vh] overflow-y-clip">
         <Header title={sidebarItems[activeIndex].label} fileCount={totalFiles} />
         {children}
       </div>

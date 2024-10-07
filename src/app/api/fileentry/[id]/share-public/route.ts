@@ -3,7 +3,9 @@ import { verifyToken } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { ApiResponse, ActionGetResponse } from '@/types';
 import { nanoid } from 'nanoid';
+import { getBaseUrl } from '@/lib/utils';
 
+const baseUrl = getBaseUrl();
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -11,7 +13,7 @@ export async function GET(
   const { id } = params;
   const response: ActionGetResponse = {
     type: 'action',
-    icon: `${process.env.NEXT_PUBLIC_APP_URL}/chakra_icon.png`,
+    icon: `${baseUrl}/chakra_icon.png`,
     title: 'Share File Publicly',
     description: `Make the file (ID: ${id}) accessible to anyone with the link.`,
     label: 'Share Publicly',
@@ -63,7 +65,7 @@ export async function POST(
     }
 
     const publicShareId = nanoid(10);
-    const publicShareUrl = `${process.env.NEXT_PUBLIC_APP_URL}/share/${publicShareId}`;
+    const publicShareUrl = `${baseUrl}/share/${publicShareId}`;
 
     await prisma.fileEntry.update({
       where: { id: fileId },

@@ -1,6 +1,7 @@
 import FileListItem from '@/app/components/files/FileListItem';
 import useDebounce from '@/app/hooks/useDebounce';
 import { FileEntryResponse } from '@/types';
+import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
 
 interface FileListViewProps {
@@ -37,7 +38,13 @@ export default function FileListView({
   }, [files, debouncedSearchInput]);
 
   return (
-    <div className="overflow-x-auto">
+    <motion.div
+      className="w-full h-full overflow-y-scroll"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.35 }}
+    >
       <table className="w-full mt-6">
         <thead>
           <tr className="border-b-2 border-[#B9B9B999] h-full">
@@ -69,6 +76,6 @@ export default function FileListView({
           ))}
         </tbody>
       </table>
-    </div>
+    </motion.div>
   );
 }

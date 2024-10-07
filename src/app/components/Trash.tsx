@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useCallback, useEffect, useState } from 'react';
 import ViewToggle from '@/app/components/ViewToggle';
 import FileDialog from '@/app/components/files/FileDialog';
 import FileGridView from '@/app/components/files/FileGridView';
@@ -11,7 +12,7 @@ import { useNotification } from '@/context/notification';
 import apiClient from '@/lib/api-client';
 import { FileEntryResponse } from '@/types';
 import { Loader2, Trash2 as TrashIcon } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import DelayedComponent from '@/app/components/common/DelayedComponent';
 
 export default function Trash() {
   const [deletedFiles, setDeletedFiles] = useState<FileEntryResponse[]>([]);
@@ -61,20 +62,23 @@ export default function Trash() {
         message: 'Folders cannot be viewed in trash',
       });
     }
-  }, [selectedFile]);
+  }, [selectedFile, setNotification]);
 
   const handleViewChange = () => setIsGridView(isListView);
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
+      <DelayedComponent
+        delay={400}
+        className="w-full h-full items-center justify-center mx-auto flex"
+      >
         <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
+      </DelayedComponent>
     );
   }
 
   return (
-    <div className="pt-4 md:pt-8 w-full h-[85%]">
+    <div className="pt-4 md:pt-8 w-full h-full">
       {isMobile ? (
         <div className="flex flex-row items-center gap-1 text-black">
           <TrashIcon className="h-4 w-4 -mt-[2px]" />

@@ -2,6 +2,7 @@ import { PublicKey, Connection, Transaction, SystemProgram } from '@solana/web3.
 import nacl from 'tweetnacl';
 import bs58 from 'bs58';
 import { env } from '@/app/utils/env';
+import { getBaseUrl } from '@/lib/utils';
 
 export async function verifySignature(
   publicKey: string,
@@ -34,7 +35,8 @@ export async function generateTipBlinkUrl(params: {
   fileName: string;
 }): Promise<string> {
   const { amount, recipientPublicKey, senderPublicKey, fileId, fileName } = params;
-  const actionUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/tip?amount=${amount}&recipient=${recipientPublicKey}&sender=${senderPublicKey}&fileId=${fileId}&fileName=${encodeURIComponent(fileName)}`;
+  const baseUrl = getBaseUrl();
+  const actionUrl = `${baseUrl}/api/tip?amount=${amount}&recipient=${recipientPublicKey}&sender=${senderPublicKey}&fileId=${fileId}&fileName=${encodeURIComponent(fileName)}`;
   return `https://blink.solana.com/?action=${encodeURIComponent(actionUrl)}`;
 }
 

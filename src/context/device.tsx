@@ -12,7 +12,7 @@ const DeviceContext = createContext<DeviceType | undefined>(undefined);
 
 export function DeviceProvider({ children }: { children: React.ReactNode }) {
   const [device, setDevice] = useState<DeviceType>({
-    isMobile: true,
+    isMobile: false,
     isTablet: false,
     isDesktop: false,
   });

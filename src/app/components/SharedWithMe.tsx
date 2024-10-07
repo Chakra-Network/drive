@@ -1,5 +1,6 @@
 'use client';
 
+import DelayedComponent from '@/app/components/common/DelayedComponent';
 import FileDialog from '@/app/components/files/FileDialog';
 import FileGridView from '@/app/components/files/FileGridView';
 import FileListView from '@/app/components/files/FileListView';
@@ -32,34 +33,31 @@ export default function SharedWithMe() {
     setTotalFiles(totalFiles);
   }, [totalFiles, setTotalFiles]);
 
-  const fetchSharedFiles = useCallback(
-    async (page: number = 1) => {
-      if (status !== 'authenticated') return;
+  const fetchSharedFiles = useCallback(async () => {
+    if (status !== 'authenticated') return;
 
-      setIsLoading(true);
-      setError(null);
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        const response = await apiClient.fileentry.getSharedWithMe({ page, pageSize: 20 });
-        if (response.data.success) {
-          setSharedFiles(response.data.data.items);
-        } else {
-          throw new Error(response.data.error || 'Failed to fetch shared files');
-        }
-      } catch (err) {
-        console.error('Error fetching shared files:', err);
-        setError('An error occurred while fetching shared files');
-        setNotification({
-          type: 'error',
-          title: 'Error',
-          message: 'Failed to load shared files',
-        });
-      } finally {
-        setIsLoading(false);
+    try {
+      const response = await apiClient.fileentry.getSharedWithMe();
+      if (response.data.success) {
+        setSharedFiles(response.data.data.items);
+      } else {
+        throw new Error(response.data.error || 'Failed to fetch shared files');
       }
-    },
-    [status, setNotification]
-  );
+    } catch (err) {
+      console.error('Error fetching shared files:', err);
+      setError('An error occurred while fetching shared files');
+      setNotification({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to load shared files',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [status, setNotification]);
 
   useEffect(() => {
     fetchSharedFiles();
@@ -72,9 +70,12 @@ export default function SharedWithMe() {
 
     if (isLoading) {
       return (
-        <div className="flex justify-center items-center h-64">
+        <DelayedComponent
+          delay={400}
+          className="w-full h-full items-center justify-center mx-auto flex"
+        >
           <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
+        </DelayedComponent>
       );
     }
 
@@ -107,10 +108,10 @@ export default function SharedWithMe() {
         searchInput={searchInput}
       />
     );
-  }, [isLoading, error, sharedFiles, isListView, searchInput, status]);
+  }, [isLoading, error, sharedFiles, isListView, searchInput, status, isMobile]);
 
   return (
-    <div className="pt-4 md:pt-8 w-full h-[85%]">
+    <div className="pt-4 md:pt-8 w-full h-full">
       {isMobile ? (
         <div className="flex flex-row items-center gap-1 text-black">
           <Users className="h-4 w-4 -mt-[2px]" />

@@ -120,15 +120,15 @@ export type PublicFileViewResponse = {
   ownerPublicKey: string;
 };
 
-export type TipPayload = {
-  amount: number;
-  publicShareId: string;
-  tipperPublicKey: string;
-};
+// export type TipPayload = {
+//   amount: number;
+//   publicShareId: string;
+//   tipperPublicKey: string;
+// };
 
-export type BlinkUrlResponse = {
-  binkUrl: string;
-};
+// export type BlinkUrlResponse = {
+//   binkUrl: string;
+// };
 
 export type ActionType = 'action' | 'completed';
 

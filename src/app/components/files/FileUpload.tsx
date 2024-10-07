@@ -1,5 +1,6 @@
 import DelayedComponent from '@/app/components/common/DelayedComponent';
 import Popup from '@/app/components/common/Popup';
+import { Button } from '@/app/components/ui/button';
 import { env } from '@/app/utils/env';
 import { FolderPlus } from 'lucide-react';
 import React, { KeyboardEvent, useCallback, useRef, useState } from 'react';
@@ -87,14 +88,14 @@ export default function FileUpload({ onFileUpload, disableUploadOptionModal }: F
   };
 
   return (
-    <DelayedComponent delay={400}>
+    <DelayedComponent delay={200} fadeDuration={0.1} className="w-full h-full">
       <div
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`flex flex-col items-center justify-center w-full h-full bg-[#142A1D0A] mt-4 rounded-2xl border hover:cursor-pointer ${
+        className={`flex flex-col items-center justify-center w-full h-[80%] bg-[#142A1D0A] rounded-2xl border hover:cursor-pointer ${
           isDragging ? 'border-green-500' : 'border-[#B9B9B94D]'
         }`}
         role="button"
@@ -119,10 +120,10 @@ export default function FileUpload({ onFileUpload, disableUploadOptionModal }: F
           }}
         >
           <div className="flex flex-col items-center gap-6 p-8 rounded-lg min-w-[400px] bg-white shadow-md">
-            <h2 className="text-xl font-semibold text-[#142A1D]">Select Upload Option:</h2>
+            <h2 className="text-xl font-semibold text-[#142A1D]">Select Upload Option</h2>
             <div className="flex justify-center gap-4">
-              <button
-                className="px-6 py-2 text-white bg-[#28a745] hover:bg-[#218838] rounded-lg transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#28a745] focus:ring-opacity-50 shadow-sm"
+              <Button
+                className="px-6 py-2 btn-primary"
                 type="button"
                 onClick={() => {
                   resolver.current?.(false);
@@ -130,9 +131,9 @@ export default function FileUpload({ onFileUpload, disableUploadOptionModal }: F
                 }}
               >
                 Public
-              </button>
-              <button
-                className="px-6 py-2 text-[#28a745] bg-white border border-[#28a745] hover:bg-[#f8f9fa] rounded-lg transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#28a745] focus:ring-opacity-50"
+              </Button>
+              <Button
+                className="px-6 py-2 btn-secondary hover:bg-gray-200"
                 type="button"
                 onClick={() => {
                   resolver.current?.(true);
@@ -140,7 +141,7 @@ export default function FileUpload({ onFileUpload, disableUploadOptionModal }: F
                 }}
               >
                 Private
-              </button>
+              </Button>
             </div>
             <p className="text-sm text-gray-600 mt-2">Public uploads are visible to everyone</p>
           </div>

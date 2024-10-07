@@ -17,7 +17,7 @@ export default function SharedFileActionsMenu({ file }: { file: FileEntryRespons
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
-          <EllipsisVertical className="h-5 w-6" />
+          <EllipsisVertical className="h-5 w-6 text-[#707D75]" />
           <span className="sr-only">Open file actions menu</span>
         </Button>
       </DropdownMenuTrigger>

@@ -68,7 +68,6 @@ function AddStorage({ onClose, onConfirm }: { onClose: () => void; onConfirm: ()
             onClose();
           }}
           disabled={isFunding}
-          className="!bg-green-500"
         >
           {isFunding ? (
             <div className="flex items-center gap-2 ">

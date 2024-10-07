@@ -1,23 +1,29 @@
-import axios, { InternalAxiosRequestConfig, AxiosHeaders } from 'axios';
+import axios, { AxiosHeaders, InternalAxiosRequestConfig } from 'axios';
+import { getBaseUrl } from './utils';
+
+const isServer = typeof window === 'undefined';
+const baseUrl = getBaseUrl();
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: `/api`,
 });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = localStorage.getItem('authToken');
-  const walletAddress = localStorage.getItem('walletAddress');
-
   // Ensure headers is an instance of AxiosHeaders
   const headers =
     config.headers instanceof AxiosHeaders ? config.headers : new AxiosHeaders(config.headers);
 
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
-  }
+  if (!isServer) {
+    const token = localStorage.getItem('authToken');
+    const walletAddress = localStorage.getItem('walletAddress');
 
-  if (walletAddress) {
-    headers.set('X-Wallet-Address', walletAddress);
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    if (walletAddress) {
+      headers.set('X-Wallet-Address', walletAddress);
+    }
   }
 
   // Return the config with the updated headers
@@ -38,8 +44,7 @@ const fileentryApi = {
   getShares: (fileId: string) => api.get(`/fileentry/share/${fileId}`),
   updateShare: (id: string, data: any) => api.put(`/fileentry/share/${id}`, data),
   removeShare: (id: string) => api.delete(`/fileentry/share/${id}`),
-  getSharedWithMe: (params?: { page?: number; pageSize?: number }) =>
-    api.get('/fileentry/shared', { params }),
+  getSharedWithMe: () => api.get('/fileentry/shared'),
   getPublic: (publicShareId: string) => api.get(`/fileentry/public/${publicShareId}`),
   getPublicShareAction: (id: string) => api.get(`/fileentry/${id}/share-public`),
   sharePublicly: (id: string, account: string) =>
@@ -71,13 +76,28 @@ const tipApi = {
   create: (data: any) => api.post('/api/tip', data),
 };
 
-// Combine all API methods
+const blinkApi = {
+  getPublic: (publicShareId: string) => api.get(`/blink/${publicShareId}`),
+  downloadPublic: (publicShareId: string, data: { account: string }) =>
+    api.post(`/blink/${publicShareId}/download`, data),
+  tip: (publicShareId: string, data: { account: string; amount: number }) =>
+    api.post(`/blink/${publicShareId}/tip`, data),
+};
+
+// Public API methods that don't require authentication
+export const publicFileApi = {
+  getPublic: (publicShareId: string) =>
+    axios.get(`${baseUrl}/api/fileentry/public/${publicShareId}`),
+};
+
+// Update the apiClient object
 const apiClient = {
   fileentry: fileentryApi,
   user: userApi,
   storage: storageApi,
   decrypt: decryptApi,
   tip: tipApi,
+  blink: blinkApi,
 };
 
 export default apiClient;

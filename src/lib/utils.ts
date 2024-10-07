@@ -1,13 +1,13 @@
 // src/app/lib/utils.ts
 
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import dayjs from 'dayjs';
-import advancedFormat from 'dayjs/plugin/advancedFormat';
-import 'dayjs/locale/en';
-import { SolanaSignInInputWithRequiredFields } from '@solana/wallet-standard-util';
-import { v4 as uuidv4 } from 'uuid';
 import { SOLANA_MAINNET_CHAIN } from '@solana/wallet-standard-chains';
+import { SolanaSignInInputWithRequiredFields } from '@solana/wallet-standard-util';
+import { clsx, type ClassValue } from 'clsx';
+import dayjs from 'dayjs';
+import 'dayjs/locale/en';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+import { twMerge } from 'tailwind-merge';
+import { v4 as uuidv4 } from 'uuid';
 
 dayjs.extend(advancedFormat);
 dayjs.locale('en');
@@ -69,4 +69,15 @@ export function formatSolAmount(amount: number): string {
     minimumFractionDigits: 2,
     maximumFractionDigits: 9,
   });
+}
+
+export function getBaseUrl(): string {
+  if (process.env.NODE_ENV === 'production') {
+    return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  }
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 }

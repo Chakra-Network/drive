@@ -5,9 +5,9 @@ import AppWithSidebarAndWallet from '@/app/components/AppWithSidebar';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isPublicFileRoute = /^\/share\/[A-Za-z0-9]{10}$/.test(pathname);
+  const isPublicShareRoute = pathname.startsWith('/share/');
 
-  if (isPublicFileRoute) {
+  if (isPublicShareRoute) {
     return children;
   }
 

@@ -1,0 +1,8 @@
+{
+  "rules": [
+    {
+      "pathPattern": "/share/*",
+      "apiPath": "/api/blink/*"
+    }
+  ]
+}

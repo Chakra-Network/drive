@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
+import prisma from '@/lib/prisma';
 import { ApiResponse, FileEntryResponse, PaginatedResponse } from '@/types';
 import { FileEntry as PrismaFileEntry } from '@prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest
@@ -15,14 +15,13 @@ export async function GET(
   const { searchParams } = new URL(request.url);
   const page = parseInt(searchParams.get('page') || '1', 10);
   const pageSize = parseInt(searchParams.get('pageSize') || '20', 10);
+  // Pagination unsupported in the frontend
 
   try {
     const [deletedFiles, totalCount] = await prisma.$transaction([
       prisma.fileEntry.findMany({
         where: { ownerPK: tokenPayload.wallet, deleted: true },
         orderBy: { updatedAt: 'desc' },
-        skip: (page - 1) * pageSize,
-        take: pageSize,
       }),
       prisma.fileEntry.count({
         where: { ownerPK: tokenPayload.wallet, deleted: true },

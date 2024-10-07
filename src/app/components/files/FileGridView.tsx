@@ -1,6 +1,7 @@
 import FileGridItem from '@/app/components/files/FileGridItem';
 import useDebounce from '@/app/hooks/useDebounce';
 import { FileEntryResponse } from '@/types';
+import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
 
 interface FileGridViewProps {
@@ -37,7 +38,13 @@ export default function FileGridView({
   }, [files, debouncedSearchInput]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 md:pt-8">
+    <motion.div
+      className="w-full h-full overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 md:pt-8 pb-0 md:pb-[200px]"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.35 }}
+    >
       {visibleFiles.map(file => (
         <FileGridItem
           key={file.id}
@@ -46,6 +53,6 @@ export default function FileGridView({
           setVisibleFiles={setVisibleFiles}
         />
       ))}
-    </div>
+    </motion.div>
   );
 }

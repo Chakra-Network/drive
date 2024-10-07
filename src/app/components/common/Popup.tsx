@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
 
 type PopupProps = {
   children: React.ReactNode;
@@ -39,10 +40,31 @@ export default function Popup({ children, zIndex, alignItems, onClose }: PopupPr
     };
   }, [onClose]);
 
-  return (
+  if (typeof window !== 'object') {
+    return (
+      <div
+        role="presentation"
+        className="fixed inset-0 bg-black bg-opacity-30 flex justify-center backdrop-blur-sm w-screen h-screen"
+        style={{ zIndex, alignItems }}
+        onClick={handleBackdropClick}
+      >
+        <div
+          ref={popupRef}
+          role="dialog"
+          aria-modal="true"
+          className="focus:outline-none"
+          tabIndex={-1}
+        >
+          {children}
+        </div>
+      </div>
+    );
+  }
+
+  return ReactDOM.createPortal(
     <div
       role="presentation"
-      className="fixed inset-0 bg-black bg-opacity-30 flex justify-center backdrop-blur-sm"
+      className="fixed inset-0 bg-black bg-opacity-30 flex justify-center backdrop-blur-sm w-screen h-screen"
       style={{ zIndex, alignItems }}
       onClick={handleBackdropClick}
     >
@@ -55,6 +77,7 @@ export default function Popup({ children, zIndex, alignItems, onClose }: PopupPr
       >
         {children}
       </div>
-    </div>
+    </div>,
+    document === undefined ? new Element() : document.body
   );
 }

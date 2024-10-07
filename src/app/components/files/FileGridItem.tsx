@@ -39,7 +39,7 @@ export default function FileGridItem({
   return (
     <div
       id={`${file.id}grid`}
-      className="bg-white rounded-lg p-4 shadow-md border border-gray-200 flex flex-col justify-between"
+      className="bg-white rounded-lg p-4 shadow-md border border-gray-200 flex flex-col justify-between max-h-[150px]"
     >
       <div className="flex flex-row items-center justify-between">
         <button

@@ -22,6 +22,7 @@ export const env = createEnv({
     NEXT_PUBLIC_RPC_URL: z.string().min(1),
     NEXT_PUBLIC_IRYS_NODE_URL: z.string().min(1),
     NEXT_PUBLIC_ENABLE_PRIVATE_FILE_UPLOAD: z.boolean().default(false),
+    NEXT_PUBLIC_APP_URL: z.string().min(1),
   },
   /*
    * Due to how Next.js bundles environment variables on Edge and Client,
@@ -37,5 +38,6 @@ export const env = createEnv({
     LIT_CAPACITY_CREDIT_TOKEN_ID: process.env.LIT_CAPACITY_CREDIT_TOKEN_ID,
     NEXT_PUBLIC_ENABLE_PRIVATE_FILE_UPLOAD:
       process.env.NEXT_PUBLIC_ENABLE_PRIVATE_FILE_UPLOAD === 'true',
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
 });

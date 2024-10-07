@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import { ApiResponse, FileEntryResponse, PaginatedResponse, FileEntryBase } from '@/types';
 import { getIrysGatewayUrl } from '@/lib/web_irys';
+import { ApiResponse, FileEntryBase, FileEntryResponse, PaginatedResponse } from '@/types';
 import { JsonValue } from '@prisma/client/runtime/library';
 import { nanoid } from 'nanoid';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
   request: NextRequest
@@ -128,6 +128,7 @@ export async function GET(
   const folderId = searchParams.get('folderId') || null;
   const page = parseInt(searchParams.get('page') || '1', 10);
   const pageSize = parseInt(searchParams.get('pageSize') || '20', 10);
+  // Pagination unsupported in the frontend
 
   try {
     const [files, totalCount] = await prisma.$transaction([
@@ -138,8 +139,6 @@ export async function GET(
           deleted: false,
         },
         orderBy: { name: 'asc' },
-        skip: (page - 1) * pageSize,
-        take: pageSize,
       }),
       prisma.fileEntry.count({
         where: {
