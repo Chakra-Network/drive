@@ -1,7 +1,13 @@
 import { addBlinkHeaders } from '@/lib/blink-utils';
 import prisma from '@/lib/prisma';
-import { ACTIONS_CORS_HEADERS, ActionGetResponse } from '@solana/actions';
 import { getBaseUrl } from '@/lib/utils';
+import { ACTIONS_CORS_HEADERS, ActionGetResponse } from '@solana/actions';
+
+const isSupportedBlinkImageFormat = (url: string | null, fileName: string) => {
+  if (!url || !fileName) return false;
+  const extension = fileName.split('.').pop()?.toLowerCase();
+  return ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(extension || '');
+};
 
 export const GET = async (req: Request) => {
   try {
@@ -29,7 +35,9 @@ export const GET = async (req: Request) => {
 
     const payload: ActionGetResponse = {
       type: 'action',
-      icon: file.url || `${appUrl}/file-icon-placeholder.png`,
+      icon: isSupportedBlinkImageFormat(file.url, file.name)
+        ? file.url || `${appUrl}/blink_placeholder.png`
+        : `${appUrl}/blink_placeholder.png`,
       title: `Chakra Drive: ${file.name}`,
       description: `View the shared file "${file.name}" or send a tip to the creator.`,
       label: 'View or Tip File',

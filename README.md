@@ -1,6 +1,9 @@
 # Chakra Drive
 
-Chakra Drive is a decentralized file storage and sharing platform built on the Solana blockchain. This README provides instructions on how to set up and run the project.
+Chakra Drive is a [decentralized file storage](https://drive.chakra.network/) and sharing platform built on the Solana blockchain. It's end-to-end encrypted (on private files) and free-to-use up to 10GBs, powered by [Irys Network](https://irys.xyz/).
+
+
+![Chakra Drive](https://github.com/user-attachments/assets/141de226-04e4-46f1-b103-31f14098d3d4)
 
 ## Table of Contents
 
