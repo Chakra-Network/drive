@@ -143,7 +143,7 @@ export default function AllFileActionsMenu({ file, setVisibleFiles }: AllFileAct
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          {!file.isPrivate && (
+          {!file.isPrivate && file.type !== 'folder' && (
             <DropdownMenuItem onClick={handleShareClicked} className="cursor-pointer">
               <Share className="mr-2 h-4 w-4" />
               <span>Share this {file.type}</span>

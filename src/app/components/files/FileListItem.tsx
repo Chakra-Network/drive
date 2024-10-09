@@ -1,10 +1,10 @@
-import React from 'react';
-import { FileEntryResponse } from '@/types';
-import { formatDate, formatFileName } from '@/lib/utils';
 import FileIcon from '@/app/components/common/FileIcon';
 import FileActionsMenu from '@/app/components/files/FileActions';
+import { formatDate, formatFileName } from '@/lib/utils';
+import { FileEntryResponse } from '@/types';
 import bytes from 'bytes';
 import { LockKeyhole } from 'lucide-react';
+import React from 'react';
 
 interface FileListItemProps {
   file: FileEntryResponse;
@@ -30,6 +30,10 @@ export default function FileListItem({
     }
     if (file.mimeType) {
       const [, subtype] = file.mimeType.split('/');
+      // if there's a '.' in the subtype, only return the part after the LAST '.'
+      if (subtype.includes('.')) {
+        return subtype.split('.').pop()?.toUpperCase();
+      }
       return subtype.toUpperCase();
     }
     return 'Unknown';

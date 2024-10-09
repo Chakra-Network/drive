@@ -39,7 +39,7 @@ export default function FileListView({
 
   return (
     <motion.div
-      className="w-full h-full overflow-y-scroll"
+      className="w-full h-[calc(100vh-200px)] overflow-y-scroll"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

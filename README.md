@@ -1,9 +1,14 @@
 # Chakra Drive
 
-Chakra Drive is a [decentralized file storage](https://drive.chakra.network/) and sharing platform built on the Solana blockchain. It's end-to-end encrypted (on private files) and free-to-use up to 10GBs, powered by [Irys Network](https://irys.xyz/).
+Chakra Drive is a [decentralized file storage](https://drive.chakra.network/) and sharing platform built on the Solana blockchain. 
+
+It's end-to-end encrypted (on private files) and free-to-use up to 10GBs, powered by [Irys Network](https://irys.xyz/).
 
 
 ![Chakra Drive](https://github.com/user-attachments/assets/141de226-04e4-46f1-b103-31f14098d3d4)
+
+[Watch the demo!](https://drive.chakra.network/demo.mp4)
+
 
 ## Table of Contents
 
@@ -15,6 +20,7 @@ Chakra Drive is a [decentralized file storage](https://drive.chakra.network/) an
 6. [API Endpoints](#api-endpoints)
 7. [Testing](#testing)
 8. [Troubleshooting](#troubleshooting)
+9. [Encryption Scheme](#encryption)
 
 ## Prerequisites
 
@@ -112,6 +118,11 @@ This will execute the tests defined in `src/test/test.ts`.
 - If you have issues with Irys uploads, check that your Solana wallet has sufficient balance and that the `IRYS_NODE_URL` is accessible.
 
 For more detailed troubleshooting, refer to the error messages in the console or server logs.
+
+## Encryption
+
+For details on how our encryption scheme works with Lit Protocol, please check out the `Lit_Protocol.MD` file
+
 
 ---
 

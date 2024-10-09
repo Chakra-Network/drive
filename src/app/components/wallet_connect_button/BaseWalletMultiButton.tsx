@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useWalletModal } from '@tiplink/wallet-adapter-react-ui';
 import { ButtonProps } from '@/app/components/ui/button';
 import { BaseWalletConnectionButton } from '@/app/components/wallet_connect_button/BaseWalletConnectionButton';
+import { useDevice } from '@/context/device';
 import { publicKeyToEmoji } from '@/lib/emoji';
-import { PublicKey } from '@solana/web3.js';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { PublicKey } from '@solana/web3.js';
+import { useWalletModal } from '@tiplink/wallet-adapter-react-ui';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 type Props = Omit<ButtonProps, 'onClick'> & {
   labels: {
@@ -49,6 +50,8 @@ function publicKeyToPastelColor(publicKey: string | PublicKey): string {
 }
 
 export function BaseWalletMultiButton({ children, labels, ...props }: Props) {
+  const { isMobile } = useDevice();
+
   const { setVisible: setModalVisible } = useWalletModal();
   const { publicKey, wallet, disconnect, connecting, connected } = useWallet();
   const [copied, setCopied] = useState(false);
@@ -71,7 +74,7 @@ export function BaseWalletMultiButton({ children, labels, ...props }: Props) {
     };
   }, []);
 
-  const content = useMemo(() => {
+  const contentBig = useMemo(() => {
     if (children) return children;
     if (connected && publicKey) {
       const base58 = publicKey.toBase58();
@@ -81,6 +84,14 @@ export function BaseWalletMultiButton({ children, labels, ...props }: Props) {
     if (wallet) return labels['has-wallet'];
     return labels['no-wallet'];
   }, [children, connecting, connected, publicKey, wallet, labels]);
+
+  // if content is a string, it will be used as the button text
+  const content = useMemo(() => {
+    if (typeof contentBig === 'string' && isMobile) {
+      return contentBig.length > 6 ? `${contentBig.slice(0, 6)}` : contentBig;
+    }
+    return contentBig;
+  }, [contentBig, isMobile]);
 
   const handleClick = () => {
     if (connected) {

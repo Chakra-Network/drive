@@ -39,7 +39,7 @@ export default function FileGridView({
 
   return (
     <motion.div
-      className="w-full h-full overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 md:pt-8 pb-0 md:pb-[200px]"
+      className="w-full max-h-full overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4 md:pt-8 pb-0 md:pb-[200px]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

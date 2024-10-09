@@ -2,6 +2,7 @@ import FileIcon from '@/app/components/common/FileIcon';
 import Popup from '@/app/components/common/Popup';
 import ShareFile from '@/app/components/common/ShareFile';
 import FilePreview from '@/app/components/files/FilePreview';
+import { useDevice } from '@/context/device';
 import { LOCATION_ICONS } from '@/lib/consts';
 import { formatAddress, formatDate, formatFileName } from '@/lib/utils';
 import { FileEntryResponse } from '@/types';
@@ -10,7 +11,6 @@ import { X } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useState } from 'react';
-import { useDevice } from '@/context/device';
 import TipButton from '../TipButton';
 import FileActionsMenu from './FileActions';
 
@@ -158,6 +158,7 @@ function FileDialog({ file, setVisibleFiles, onClose, isNotOwner, currentPath }:
                   <FileMetric
                     label="Public Share Link"
                     metric={`${window.location.origin}/share/${file.publicShareId}`}
+                    href={`${window.location.origin}/share/${file.publicShareId}`}
                   />
                 )}
               </div>
@@ -254,6 +255,7 @@ function FileDialog({ file, setVisibleFiles, onClose, isNotOwner, currentPath }:
                 <FileMetric
                   label="Public Share Link"
                   metric={`${window.location.origin}/share/${file.publicShareId}`}
+                  href={`${window.location.origin}/share/${file.publicShareId}`}
                 />
               )}
             </div>

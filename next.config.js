@@ -45,6 +45,10 @@ const nextConfig = {
             key: 'User-Agent',
             value: '(.*Twitterbot.*)',
           },
+          {
+            key: 'X-Frame-Options',
+            value: 'ALLOWALL',
+          },
         ],
       },
       // Add security headers
@@ -53,7 +57,7 @@ const nextConfig = {
         headers: [
           {
             key: 'X-Frame-Options',
-            value: 'DENY',
+            value: 'SAMEORIGIN',
           },
           {
             key: 'X-Content-Type-Options',

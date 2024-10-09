@@ -1,78 +1,14 @@
 import { Metadata } from 'next';
 import { publicFileApi } from '@/lib/api-client';
 import { getBaseUrl } from '@/lib/utils';
-import { FileEntryResponse } from '@/types';
 import ShareContent from './ClientShareContent';
 
 type Props = {
   params: { publicShareId: string };
 };
 
-function getFileTypeInfo(file: FileEntryResponse): {
-  type: string;
-  icon: string;
-  description: string;
-} {
-  if (file.type === 'folder') {
-    return {
-      type: 'Folder',
-      icon: 'folder.png',
-      description: `Explore this shared folder "${file.name}" on Chakra Drive.`,
-    };
-  }
-
-  const extension = file.name.split('.').pop()?.toLowerCase();
-  const mimeType = file.mimeType?.toLowerCase() || '';
-
-  if (mimeType.startsWith('image/') || ['jpg', 'jpeg', 'png', 'svg'].includes(extension || '')) {
-    return {
-      type: 'Image',
-      icon: file.url || (extension === 'svg' ? 'svg.png' : 'png.png'),
-      description: `View this image "${file.name}" shared on Chakra Drive.`,
-    };
-  }
-
-  if (mimeType.startsWith('video/') || ['mp4', 'mov'].includes(extension || '')) {
-    return {
-      type: 'Video',
-      icon: extension === 'mp4' ? 'mp4.png' : 'mov.png',
-      description: `Watch this video "${file.name}" shared on Chakra Drive.`,
-    };
-  }
-
-  if (mimeType.startsWith('audio/') || extension === 'wav') {
-    return {
-      type: 'Audio',
-      icon: 'wav.png',
-      description: `Listen to this audio file "${file.name}" shared on Chakra Drive.`,
-    };
-  }
-
-  if (mimeType === 'application/pdf' || extension === 'pdf') {
-    return {
-      type: 'PDF',
-      icon: 'pdf.png',
-      description: `Read this PDF "${file.name}" shared on Chakra Drive.`,
-    };
-  }
-
-  if (extension === 'doc' || extension === 'docx') {
-    return {
-      type: 'Document',
-      icon: 'doc.png',
-      description: `View this document "${file.name}" shared on Chakra Drive.`,
-    };
-  }
-
-  // Default case for other file types
-  return {
-    type: 'File',
-    icon: 'file.png',
-    description: `Access this file "${file.name}" shared on Chakra Drive.`,
-  };
-}
-
 const baseUrl = getBaseUrl();
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { publicShareId } = params;
 
@@ -86,11 +22,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { file } = response.data.data;
     const fileUrl = `${baseUrl}/share/${publicShareId}`;
 
-    const { type, icon, description } = getFileTypeInfo(file);
+    let imageUrl = `${baseUrl}/chakra_preview.png`;
+    let description = `Access this file "${file.name}" shared on Chakra Drive.`;
 
-    const imageUrl = icon.startsWith('http') ? icon : `${baseUrl}/file-icons/${icon}`;
+    // Use actual image URL for image files
+    if (file.mimeType.startsWith('image/')) {
+      imageUrl = file.url;
+      description = `View this image "${file.name}" shared on Chakra Drive.`;
+    }
 
-    const title = `Chakra Drive: ${type} - ${file.name}`;
+    const title = `Chakra Drive: ${file.name}`;
 
     const metadata: Metadata = {
       title,
@@ -106,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             url: imageUrl,
             width: 1200,
             height: 630,
-            alt: `${type} icon for ${file.name}`,
+            alt: `Preview for ${file.name}`,
           },
         ],
       },
@@ -132,11 +73,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         type: 'website',
         url: `${baseUrl}/share/${publicShareId}`,
         siteName: 'Chakra Drive',
+        images: [
+          {
+            url: `${baseUrl}/chakra_preview.png`,
+            width: 1200,
+            height: 630,
+            alt: 'Chakra Drive Preview',
+          },
+        ],
       },
       twitter: {
-        card: 'summary',
+        card: 'summary_large_image',
         title: 'Chakra Drive - Shared Content',
         description: 'View or download shared content on Chakra Drive.',
+        images: [`${baseUrl}/chakra_preview.png`],
         site: '@chakra_ai',
       },
     };

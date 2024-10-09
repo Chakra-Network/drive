@@ -39,7 +39,7 @@ export const GET = async (req: Request) => {
         ? file.url || `${appUrl}/blink_placeholder.png`
         : `${appUrl}/blink_placeholder.png`,
       title: `Chakra Drive: ${file.name}`,
-      description: `View the shared file "${file.name}" or send a tip to the creator.`,
+      description: `Click to view file at Chakra Drive or send a tip to the creator.`,
       label: 'View or Tip File',
       links: {
         actions: [
@@ -67,11 +67,11 @@ export const GET = async (req: Request) => {
               },
             ],
           },
-          {
-            type: 'external-link',
-            href: `${appUrl}/api/blink/${publicShareId}/view`,
-            label: 'View File',
-          },
+          // {
+          //   type: 'external-link',
+          //   href: `${appUrl}/api/blink/${publicShareId}/view`,
+          //   label: 'View File',
+          // },
         ],
       },
     };
