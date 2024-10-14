@@ -75,6 +75,7 @@ Before you begin, ensure you have the following installed:
    JWT_SECRET="your-secret-key"
    NEXT_PUBLIC_IRYS_NODE_URL="https://node1.irys.xyz"
    NEXT_PUBLIC_RPC_URL="https://api.mainnet-beta.solana.com"
+   NEXT_PUBLIC_APP_URL="http://localhost:3000"
    ```
 
    Replace `username`, `password`, and other placeholder values with your actual configuration.
