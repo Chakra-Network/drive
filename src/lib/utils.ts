@@ -54,10 +54,10 @@ export function createSiwsInput(
   const now = new Date();
 
   return {
-    domain: window.location.host,
+    domain: 'drive.chakra.network',
     address: publicKey,
     statement,
-    uri: window.location.origin,
+    uri: 'https://drive.chakra.network',
     chainId: SOLANA_MAINNET_CHAIN,
     nonce: uuidv4(),
     issuedAt: now.toISOString(),

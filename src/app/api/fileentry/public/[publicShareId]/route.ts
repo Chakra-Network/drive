@@ -33,6 +33,7 @@ function createFileEntryResponse(file: any): FileEntryResponse {
     size: file.size ?? 0,
     mimeType: file.mimeType ?? 'application/octet-stream',
     url: file.url ?? '',
+    privateVersion: file.privateVersion,
   };
 }
 

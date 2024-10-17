@@ -330,18 +330,27 @@ const PrivateFilePreview: React.FC<{ file: FileEntryResponse; mimeType: string }
   mimeType,
 }) => {
   const [processedUrl, setProcessedUrl] = useState<string>('');
-  const { publicKey } = useWallet();
+  const { publicKey, signMessage } = useWallet();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { isMobile } = useDevice();
 
   useEffect(() => {
+    let newProcessedUrl = '';
     const processFile = async () => {
-      if (!isFileType(file) || !publicKey) return;
+      if (!isFileType(file) || !publicKey || !signMessage) return;
       try {
-        const fileData = await fetchAndDecryptMultipartBytes(file.url, publicKey);
+        const fileData = await fetchAndDecryptMultipartBytes(
+          file.url,
+          publicKey,
+          file.privateVersion,
+          signMessage,
+          () => {
+            setError('Failed to decrypt file. Please try again.');
+          }
+        );
         const blob = new Blob([fileData], { type: mimeType });
-        const newProcessedUrl = URL.createObjectURL(blob);
+        newProcessedUrl = URL.createObjectURL(blob);
         setProcessedUrl(newProcessedUrl);
       } catch (err) {
         console.error('Error processing file:', err);
@@ -354,9 +363,9 @@ const PrivateFilePreview: React.FC<{ file: FileEntryResponse; mimeType: string }
     processFile();
 
     return () => {
-      if (processedUrl) URL.revokeObjectURL(processedUrl);
+      if (newProcessedUrl) URL.revokeObjectURL(newProcessedUrl);
     };
-  }, [file, publicKey, mimeType, processedUrl]);
+  }, [file, publicKey, mimeType, signMessage]);
 
   if (loading) {
     return (
@@ -386,7 +395,7 @@ const PrivateFilePreview: React.FC<{ file: FileEntryResponse; mimeType: string }
 };
 
 const FilePreview: React.FC<{ file: FileEntryResponse }> = ({ file }) => {
-  const { publicKey } = useWallet();
+  const { publicKey, signMessage } = useWallet();
   const { setNotification } = useNotification();
   const { isMobile } = useDevice();
 
@@ -396,7 +405,15 @@ const FilePreview: React.FC<{ file: FileEntryResponse }> = ({ file }) => {
   }, [file]);
 
   const handleDownload = () => {
-    handleDownloadClicked(file, setNotification, publicKey);
+    if (!signMessage) {
+      setNotification({
+        type: 'error',
+        title: 'Download Error',
+        message: 'Failed to download file. Please try again.',
+      });
+      return;
+    }
+    handleDownloadClicked(file, setNotification, publicKey, signMessage);
   };
 
   if (!isFileType(file)) {

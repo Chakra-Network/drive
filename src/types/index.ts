@@ -38,6 +38,7 @@ export type FileEntryResponse = Omit<FileEntryBase, 'createdAt' | 'updatedAt'> &
         size: number;
         mimeType: string;
         url: string;
+        privateVersion: number;
       }
     | {
         type: 'folder';

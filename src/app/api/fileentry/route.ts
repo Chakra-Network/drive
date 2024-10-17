@@ -1,4 +1,5 @@
 import { verifyToken } from '@/lib/auth';
+import { CURRENT_PRIVATE_VERSION } from '@/lib/consts';
 import prisma from '@/lib/prisma';
 import { getIrysGatewayUrl } from '@/lib/web_irys';
 import { ApiResponse, FileEntryBase, FileEntryResponse, PaginatedResponse } from '@/types';
@@ -41,6 +42,7 @@ export async function POST(
       isPrivate: !!isPrivate,
       isPubliclyShared: false,
       publicShareId: null,
+      privateVersion: CURRENT_PRIVATE_VERSION,
     };
 
     if (type === 'file') {
@@ -95,6 +97,7 @@ export async function POST(
             size: file.size!,
             mimeType: file.mimeType!,
             url: file.url!,
+            privateVersion: file.privateVersion,
           }
         : {
             ...baseResponse,
@@ -177,6 +180,7 @@ export async function GET(
             size: file.size!,
             mimeType: file.mimeType!,
             url: file.url!,
+            privateVersion: file.privateVersion,
           };
         }
         return {
@@ -276,6 +280,7 @@ export async function PATCH(
             size: updatedFile.size!,
             mimeType: updatedFile.mimeType!,
             url: updatedFile.url!,
+            privateVersion: updatedFile.privateVersion,
           }
         : {
             ...baseResponse,

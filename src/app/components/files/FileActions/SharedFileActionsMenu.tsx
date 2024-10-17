@@ -8,10 +8,12 @@ import {
 } from '@/app/components/ui/dropdown-menu';
 import { useNotification } from '@/context/notification';
 import { FileEntryResponse } from '@/types';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { Download, EllipsisVertical } from 'lucide-react';
 
 export default function SharedFileActionsMenu({ file }: { file: FileEntryResponse }) {
   const { setNotification } = useNotification();
+  const { signMessage } = useWallet();
 
   return (
     <DropdownMenu>
@@ -22,13 +24,15 @@ export default function SharedFileActionsMenu({ file }: { file: FileEntryRespons
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuItem
-          onClick={() => handleDownloadClicked(file, setNotification, null)}
-          className="cursor-pointer"
-        >
-          <Download className="mr-2 h-4 w-4" />
-          <span>Download</span>
-        </DropdownMenuItem>
+        {signMessage && (
+          <DropdownMenuItem
+            onClick={() => handleDownloadClicked(file, setNotification, null, signMessage)}
+            className="cursor-pointer"
+          >
+            <Download className="mr-2 h-4 w-4" />
+            <span>Download</span>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

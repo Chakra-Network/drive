@@ -58,6 +58,7 @@ export async function GET(
         size: file.size!,
         mimeType: file.mimeType!,
         url: file.url!,
+        privateVersion: file.privateVersion,
       };
     });
 

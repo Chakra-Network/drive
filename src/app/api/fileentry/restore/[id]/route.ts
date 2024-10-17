@@ -67,6 +67,7 @@ export async function POST(
           size: restoredFile.size!,
           mimeType: restoredFile.mimeType!,
           url: restoredFile.url!,
+          privateVersion: restoredFile.privateVersion,
         };
 
     return NextResponse.json({ success: true, data: response });

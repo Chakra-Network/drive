@@ -74,6 +74,7 @@ export function createFileEntryResponse(file: any): FileEntryResponse {
     isPubliclyShared: file.isPubliclyShared,
     publicShareId: file.publicShareId,
     uploadedSize: file.uploadedSize,
+    privateVersion: file.privateVersion,
   };
 
   if (file.type === 'folder') {
