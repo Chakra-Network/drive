@@ -26,7 +26,8 @@ interface AllFileActionsMenuProps {
 export const handleDownloadClicked = async (
   file: FileEntryResponse,
   setNotification: (params: NotificationParams) => void,
-  publicKey: PublicKey | null
+  publicKey: PublicKey | null,
+  signMessage: (message: Uint8Array) => Promise<Uint8Array>
 ) => {
   if (!isFileType(file) || !file.url) {
     setNotification({
@@ -48,7 +49,19 @@ export const handleDownloadClicked = async (
         title: 'Decrypting file from Lit Protocol.',
         message: 'Download will begin shortly.',
       });
-      const decryptedData = await fetchAndDecryptMultipartBytes(file.url, publicKey);
+      const decryptedData = await fetchAndDecryptMultipartBytes(
+        file.url,
+        publicKey,
+        file.privateVersion,
+        signMessage,
+        () => {
+          setNotification({
+            type: 'error',
+            title: 'Download Error',
+            message: 'Failed to decrypt file from Lit.',
+          });
+        }
+      );
       fileData = new Blob([decryptedData], { type: file.mimeType });
     } else {
       const response = await fetch(file.url);
@@ -113,7 +126,7 @@ export default function AllFileActionsMenu({ file, setVisibleFiles }: AllFileAct
     setVisibleFiles(prevFiles => prevFiles.filter(f => f.id !== file.id));
   };
 
-  const { publicKey } = useWallet();
+  const { publicKey, signMessage } = useWallet();
 
   return (
     <>
@@ -149,9 +162,9 @@ export default function AllFileActionsMenu({ file, setVisibleFiles }: AllFileAct
               <span>Share this {file.type}</span>
             </DropdownMenuItem>
           )}
-          {file.type === 'file' && (
+          {file.type === 'file' && signMessage && (
             <DropdownMenuItem
-              onClick={() => handleDownloadClicked(file, setNotification, publicKey)}
+              onClick={() => handleDownloadClicked(file, setNotification, publicKey, signMessage)}
               className="cursor-pointer"
             >
               <Download className="mr-2 h-4 w-4" />

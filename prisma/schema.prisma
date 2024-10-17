@@ -50,6 +50,7 @@ model FileEntry {
   parent            FileEntry?  @relation("ParentChild", fields: [folderId], references: [id])
   children          FileEntry[] @relation("ParentChild")
   shares            FileShare[]
+  privateVersion    Int      @default(0)
 
   @@index([ownerPK])
   @@index([folderId])

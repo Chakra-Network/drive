@@ -22,4 +22,4 @@ Adjust the params as needed in `scripts/create_lit_wallet.ts` and run `ts-node -
 
 ### Lit Actions
 
-Note that in the above diagram, lit actions are performed on the lit nodes. We have lit actions defined in `src/app/lib/litActionSiws.ts`. When this is ready to be used, run `npm run build:lit-action` to generate the Lit Action JS file. This file is then imported as raw code in the frontend to be used to send to Lit nodes. Once this is generated once, and files are encrypted with it as a condition, it cannot be changed. If so, the decryption on said files will fail.
+Note that in the above diagram, lit actions are performed on the lit nodes. We have lit actions defined in `dist/litActionSiws_v0.ts` and `dist/litActionSiws_v1.ts`. **NEVER** modify these. Instead, create a new file with a new version number, add it as an entrypoint in `esbuild.js`, and run `npm run build:lit-action` to generate the new Lit Action JS file. This file is then imported as raw code in the frontend to be used to send to Lit nodes. The files are encrypted with the code as a condition, so they cannot be changed – otherwise the decryption on said files will fail.

@@ -1,3 +1,4 @@
+import { requestSiwsMessage } from '@/app/components/client_lib/lit_encryption';
 import Notification from '@/app/components/common/Notification';
 import Popup from '@/app/components/common/Popup';
 import {
@@ -9,12 +10,8 @@ import {
 } from '@/app/components/ui/dialog';
 import { ScrollArea } from '@/app/components/ui/scroll-area';
 import apiClient from '@/lib/api-client';
-import { storeSIWSMessage } from '@/lib/auth';
-import { createSiwsInput } from '@/lib/utils';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { createSignInMessage } from '@solana/wallet-standard-util';
 import { useWalletModal } from '@tiplink/wallet-adapter-react-ui';
-import bs58 from 'bs58';
 import { Loader2 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -187,29 +184,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const message = `Authenticate with Chakra Drive: ${Date.now()}`;
-      console.log('Requesting signature');
-      const siwsInput = createSiwsInput(publicKey.toBase58(), message);
-      const signInMessage = createSignInMessage(siwsInput);
-      const signature = signMessage ? await signMessage(signInMessage) : null;
-
-      if (!signature) {
-        setAuthError('Failed to authenticate, no signature found');
+      if (!signMessage) {
+        setAuthError('Failed to authenticate, no signMessage function found');
         return;
       }
 
-      const bs58Signature = bs58.encode(signature);
-
-      storeSIWSMessage({
-        b58SignInMessage: bs58.encode(signInMessage),
-        b58Signature: bs58Signature,
+      const storedSIWSObject = await requestSiwsMessage(publicKey, signMessage, () => {
+        setAuthError('Failed to authenticate, no signature found');
       });
+
+      if (!storedSIWSObject) {
+        return;
+      }
 
       console.log('Sending authentication request to server');
       const response = await apiClient.user.login({
         publicKey: publicKey.toBase58(),
-        signature: bs58Signature,
-        message: bs58.encode(signInMessage),
+        signature: storedSIWSObject.b58Signature,
+        message: storedSIWSObject.b58SignInMessage,
       });
 
       if (response.data.success) {

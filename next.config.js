@@ -2,7 +2,7 @@
 const nextConfig = {
   webpack: config => {
     config.module.rules.push({
-      test: /litActionSiws\.js$/,
+      test: /litActionSiws_v\d+\.js$/,
       use: {
         loader: 'raw-loader',
         options: {

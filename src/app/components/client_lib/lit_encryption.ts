@@ -2,20 +2,24 @@ import * as LitJsSdk from '@lit-protocol/lit-node-client';
 import { SessionSigsMap } from '@lit-protocol/types';
 import { PublicKey } from '@solana/web3.js';
 import { LIT_RPC } from '@lit-protocol/constants';
-import { INTEGER_BYTE_LENGTH, LIT_NETWORK } from '@/lib/consts';
-import { parseSignInMessage } from '@solana/wallet-standard-util';
+import { CURRENT_PRIVATE_VERSION, INTEGER_BYTE_LENGTH, LIT_NETWORK } from '@/lib/consts';
+import { createSignInMessage, parseSignInMessage } from '@solana/wallet-standard-util';
 import ipfsOnlyHash from 'typestub-ipfs-only-hash';
 import nacl from 'tweetnacl';
 import axios from 'axios';
 import bs58 from 'bs58';
 import apiClient from '@/lib/api-client';
-import { SiwsObject } from '@/types';
-import { retrieveStoredSIWSMessage } from '@/lib/auth';
+import { SiwsObject, StoredSIWSObject } from '@/types';
+import { retrieveStoredSIWSMessage, storeSIWSMessage } from '@/lib/auth';
+import { createSiwsInput } from '@/lib/utils';
 // @ts-expect-error need to override for importing js as string
 // eslint-disable-next-line import/extensions
-import litActionCodeContent from '../../../dist/litActionSiws.js?raw';
+import litActionCodeV0 from '../../../dist/litActionSiws_v0.js?raw';
+// @ts-expect-error need to override for importing js as string
+// eslint-disable-next-line import/extensions
+import litActionCodeV1 from '../../../dist/litActionSiws_v1.js?raw';
 
-const litActionCode = litActionCodeContent;
+const SIWS_MESSAGE_EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 1 day – make sure this matches the expiration time in the litActionSiws.ts file, and the generated litActionSiws.js file imported above
 
 async function calculateLitActionCodeCID(input: string): Promise<string> {
   try {
@@ -27,7 +31,8 @@ async function calculateLitActionCodeCID(input: string): Promise<string> {
   }
 }
 
-async function conditionsToDecrypt(publicKey: PublicKey) {
+async function conditionsToDecrypt(publicKey: PublicKey, version: number) {
+  const litActionCode = version === 0 ? litActionCodeV0 : litActionCodeV1;
   return [
     {
       method: '',
@@ -80,7 +85,7 @@ class Lit {
     publicKey: PublicKey;
     encryptionKey: nacl.BoxKeyPair;
   }): Promise<{ dataToEncryptHash: string; ciphertext: string }> {
-    const solRpcConditions = await conditionsToDecrypt(publicKey);
+    const solRpcConditions = await conditionsToDecrypt(publicKey, CURRENT_PRIVATE_VERSION);
     const { ciphertext, dataToEncryptHash } = await this.litNodeClient.encrypt({
       dataToEncrypt: Buffer.from(Buffer.from(encryptionKey.secretKey).toString('base64')),
       solRpcConditions,
@@ -94,14 +99,17 @@ class Lit {
     dataToEncryptHash,
     sessionSigs,
     siwsObject,
+    privateVersion,
   }: {
     publicKey: PublicKey;
     ciphertext: string;
     dataToEncryptHash: string;
     sessionSigs: SessionSigsMap;
     siwsObject: SiwsObject;
+    privateVersion: number;
   }): Promise<nacl.BoxKeyPair> {
-    const solRpcConditions = await conditionsToDecrypt(publicKey);
+    const solRpcConditions = await conditionsToDecrypt(publicKey, privateVersion);
+    const litActionCode = privateVersion === 0 ? litActionCodeV0 : litActionCodeV1;
     const response = await this.litNodeClient.executeJs({
       code: litActionCode,
       sessionSigs,
@@ -112,6 +120,9 @@ class Lit {
         dataToEncryptHash,
       },
     });
+    if (!response.success) {
+      throw new Error('Failed to decrypt encryption key');
+    }
     const decryptedKey = nacl.box.keyPair.fromSecretKey(
       Buffer.from(response.response as string, 'base64')
     );
@@ -257,21 +268,72 @@ function decrypt(
   return decrypted;
 }
 
+async function requestSiwsMessage(
+  publicKey: PublicKey,
+  signMessage: (message: Uint8Array) => Promise<Uint8Array>,
+  onSignFailed: () => void
+): Promise<StoredSIWSObject | null> {
+  const message = `ONLY SIGN THIS MESSAGE IF YOU ARE SIGNING ON drive.chakra.network. DO NOT SIGN THIS MESSAGE IF YOU ARE SIGNING ON ANY OTHER SITE.`;
+  console.log('Requesting signature');
+  const siwsInput = createSiwsInput(publicKey.toBase58(), message);
+  const signInMessage = createSignInMessage(siwsInput);
+  const signature = signMessage ? await signMessage(signInMessage) : null;
+
+  if (!signature) {
+    onSignFailed();
+    // setAuthError('Failed to authenticate, no signature found');
+    return null;
+  }
+
+  const bs58Signature = bs58.encode(signature);
+
+  const storedSIWSObject = {
+    b58SignInMessage: bs58.encode(signInMessage),
+    b58Signature: bs58Signature,
+  };
+
+  storeSIWSMessage(storedSIWSObject);
+
+  return storedSIWSObject;
+}
+
 // use this function when fetching a url that contains a file constructed from the `constructMultipartEncryptedBytes` function above
 async function fetchAndDecryptMultipartBytes(
   keyAndFileUrl: string,
-  publicKey: PublicKey
+  publicKey: PublicKey,
+  privateVersion: number,
+  signMessage: (message: Uint8Array) => Promise<Uint8Array>,
+  onSignFailed: () => void
 ): Promise<Uint8Array> {
   const [{ ciphertext, dataToEncryptHash, encryptedMessage }, sessionSigs] = await Promise.all([
     fetchEncryptedEncryptionKey(keyAndFileUrl),
     fetchSessionSigs(publicKey),
   ]);
 
-  const storedSIWSObject = retrieveStoredSIWSMessage();
+  let storedSIWSObject = retrieveStoredSIWSMessage();
 
   if (!storedSIWSObject) {
-    // TODO: if there's no object here, ask for the user to sign a new SIWS message again
-    throw new Error('Failed to retrieve sign in message or signature');
+    storedSIWSObject = await requestSiwsMessage(publicKey, signMessage, onSignFailed);
+  }
+
+  if (!storedSIWSObject) {
+    onSignFailed();
+    throw new Error('Failed to authenticate, no signature found');
+  }
+
+  const signInMessage = parseSignInMessage(bs58.decode(storedSIWSObject.b58SignInMessage));
+
+  if (
+    !signInMessage ||
+    !signInMessage.issuedAt ||
+    Date.parse(signInMessage.issuedAt) < Date.now() - SIWS_MESSAGE_EXPIRATION_TIME
+  ) {
+    storedSIWSObject = await requestSiwsMessage(publicKey, signMessage, onSignFailed);
+  }
+
+  if (!storedSIWSObject) {
+    onSignFailed();
+    throw new Error('Failed to authenticate, no signature found');
   }
 
   const { b58SignInMessage, b58Signature } = storedSIWSObject;
@@ -282,8 +344,6 @@ async function fetchAndDecryptMultipartBytes(
   if (!solanaSignInObject) {
     throw new Error('Failed to parse sign in message');
   }
-
-  // TODO: if the solana sign in object is expired, we need to ask the user to sign a new SIWS message
 
   const decryptedKey = await (
     await getLit()
@@ -296,6 +356,7 @@ async function fetchAndDecryptMultipartBytes(
       siwsInput: solanaSignInObject,
       signature: b58Signature,
     },
+    privateVersion,
   });
 
   const decryptedMessage = decrypt(
@@ -307,4 +368,4 @@ async function fetchAndDecryptMultipartBytes(
   return decryptedMessage;
 }
 
-export { constructMultipartEncryptedBytes, fetchAndDecryptMultipartBytes };
+export { constructMultipartEncryptedBytes, fetchAndDecryptMultipartBytes, requestSiwsMessage };

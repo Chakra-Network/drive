@@ -19,3 +19,5 @@ export const ONE_MB_IN_BYTES = 1024 * 1024;
 export const LIT_NETWORK = LitNetwork.Datil;
 
 export const INTEGER_BYTE_LENGTH = 4;
+
+export const CURRENT_PRIVATE_VERSION = 1;

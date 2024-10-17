@@ -292,6 +292,7 @@ export default function AllFiles({ path }: { path: string | string[] | undefined
         isPrivate,
         isPubliclyShared: false,
         publicShareId: null,
+        privateVersion: 1,
       }));
 
       setPendingFiles(pendingFileEntries);
@@ -323,6 +324,7 @@ export default function AllFiles({ path }: { path: string | string[] | undefined
             folderId: folderId || null,
             irysFileId: uploadResponse.id,
             isPrivate,
+            privateVersion: 1,
           });
 
           if (response.data.success) {
