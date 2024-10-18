@@ -10,14 +10,17 @@ import axios from 'axios';
 import bs58 from 'bs58';
 import apiClient from '@/lib/api-client';
 import { SiwsObject, StoredSIWSObject } from '@/types';
-import { retrieveStoredSIWSMessage, storeSIWSMessage } from '@/lib/auth';
-import { createSiwsInput } from '@/lib/utils';
+import { retrieveStoredSIWSMessageWithNonce, storeSIWSMessageWithNonce } from '@/lib/auth';
+import { createSiwsInput, generateJwtHash, retrieveAuthToken } from '@/lib/utils';
 // @ts-expect-error need to override for importing js as string
 // eslint-disable-next-line import/extensions
 import litActionCodeV0 from '../../../dist/litActionSiws_v0.js?raw';
 // @ts-expect-error need to override for importing js as string
 // eslint-disable-next-line import/extensions
 import litActionCodeV1 from '../../../dist/litActionSiws_v1.js?raw';
+// @ts-expect-error need to override for importing js as string
+// eslint-disable-next-line import/extensions
+import litActionCodeV2 from '../../../dist/litActionSiws_v2.js?raw';
 
 const SIWS_MESSAGE_EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 1 day – make sure this matches the expiration time in the litActionSiws.ts file, and the generated litActionSiws.js file imported above
 
@@ -31,8 +34,19 @@ async function calculateLitActionCodeCID(input: string): Promise<string> {
   }
 }
 
+function getLitActionCode(version: number): string {
+  switch (version) {
+    case 0:
+      return litActionCodeV0;
+    case 1:
+      return litActionCodeV1;
+    default:
+      return litActionCodeV2;
+  }
+}
+
 async function conditionsToDecrypt(publicKey: PublicKey, version: number) {
-  const litActionCode = version === 0 ? litActionCodeV0 : litActionCodeV1;
+  const litActionCode = getLitActionCode(version);
   return [
     {
       method: '',
@@ -109,7 +123,7 @@ class Lit {
     privateVersion: number;
   }): Promise<nacl.BoxKeyPair> {
     const solRpcConditions = await conditionsToDecrypt(publicKey, privateVersion);
-    const litActionCode = privateVersion === 0 ? litActionCodeV0 : litActionCodeV1;
+    const litActionCode = getLitActionCode(privateVersion);
     const response = await this.litNodeClient.executeJs({
       code: litActionCode,
       sessionSigs,
@@ -120,6 +134,7 @@ class Lit {
         dataToEncryptHash,
       },
     });
+    // console.log('response from lit', response);
     if (!response.success) {
       throw new Error('Failed to decrypt encryption key');
     }
@@ -268,20 +283,32 @@ function decrypt(
   return decrypted;
 }
 
-async function requestSiwsMessage(
-  publicKey: PublicKey,
-  signMessage: (message: Uint8Array) => Promise<Uint8Array>,
-  onSignFailed: () => void
-): Promise<StoredSIWSObject | null> {
-  const message = `ONLY SIGN THIS MESSAGE IF YOU ARE SIGNING ON drive.chakra.network. DO NOT SIGN THIS MESSAGE IF YOU ARE SIGNING ON ANY OTHER SITE.`;
+async function requestSiwsMessage({
+  publicKey,
+  signMessage,
+  onSignFailed,
+  isForLitDecryption,
+}: {
+  publicKey: PublicKey;
+  signMessage: (message: Uint8Array) => Promise<Uint8Array>;
+  onSignFailed: () => void;
+  isForLitDecryption: boolean;
+}): Promise<StoredSIWSObject | null> {
   console.log('Requesting signature');
-  const siwsInput = createSiwsInput(publicKey.toBase58(), message);
+  const authToken = retrieveAuthToken();
+  const hash = authToken ? generateJwtHash(authToken) : '';
+  const siwsInput = createSiwsInput(
+    publicKey.toBase58(),
+    hash,
+    isForLitDecryption
+      ? 'Please sign again to authenticate for decryption'
+      : 'Sign In to Chakra Drive'
+  );
   const signInMessage = createSignInMessage(siwsInput);
   const signature = signMessage ? await signMessage(signInMessage) : null;
 
   if (!signature) {
     onSignFailed();
-    // setAuthError('Failed to authenticate, no signature found');
     return null;
   }
 
@@ -292,7 +319,9 @@ async function requestSiwsMessage(
     b58Signature: bs58Signature,
   };
 
-  storeSIWSMessage(storedSIWSObject);
+  if (authToken) {
+    storeSIWSMessageWithNonce(storedSIWSObject);
+  }
 
   return storedSIWSObject;
 }
@@ -310,10 +339,15 @@ async function fetchAndDecryptMultipartBytes(
     fetchSessionSigs(publicKey),
   ]);
 
-  let storedSIWSObject = retrieveStoredSIWSMessage();
+  let storedSIWSObject = retrieveStoredSIWSMessageWithNonce();
 
   if (!storedSIWSObject) {
-    storedSIWSObject = await requestSiwsMessage(publicKey, signMessage, onSignFailed);
+    storedSIWSObject = await requestSiwsMessage({
+      publicKey,
+      signMessage,
+      onSignFailed,
+      isForLitDecryption: true,
+    });
   }
 
   if (!storedSIWSObject) {
@@ -328,7 +362,12 @@ async function fetchAndDecryptMultipartBytes(
     !signInMessage.issuedAt ||
     Date.parse(signInMessage.issuedAt) < Date.now() - SIWS_MESSAGE_EXPIRATION_TIME
   ) {
-    storedSIWSObject = await requestSiwsMessage(publicKey, signMessage, onSignFailed);
+    storedSIWSObject = await requestSiwsMessage({
+      publicKey,
+      signMessage,
+      onSignFailed,
+      isForLitDecryption: true,
+    });
   }
 
   if (!storedSIWSObject) {

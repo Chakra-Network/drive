@@ -12,6 +12,7 @@ export const env = createEnv({
     JWT_SECRET: z.string().min(1),
     LIT_PRIVATE_KEY: z.string().min(1),
     LIT_CAPACITY_CREDIT_TOKEN_ID: z.string().min(1),
+    CRON_SECRET: z.string().min(1),
   },
   /*
    * Environment variables available on the client (and server).
@@ -39,5 +40,6 @@ export const env = createEnv({
     NEXT_PUBLIC_ENABLE_PRIVATE_FILE_UPLOAD:
       process.env.NEXT_PUBLIC_ENABLE_PRIVATE_FILE_UPLOAD === 'true',
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    CRON_SECRET: process.env.CRON_SECRET,
   },
 });

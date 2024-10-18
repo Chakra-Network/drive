@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/remove_old_jwt_hashes",
+      "schedule": "0 */12 * * *"
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifySignature } from '@/lib/solana';
 import { generateToken } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { generateJwtHash } from '@/lib/utils';
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -55,6 +56,14 @@ export async function POST(req: NextRequest) {
     });
 
     const token = generateToken(publicKey);
+
+    // storing a hash of the jwt in the database. This is used by the lit action nodes to verify proper ownership
+    await prisma.jwtHash.create({
+      data: {
+        hash: generateJwtHash(token),
+        publicKey,
+      },
+    });
 
     console.log('Login successful');
     return NextResponse.json(
