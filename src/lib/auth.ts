@@ -6,13 +6,14 @@ import bs58 from 'bs58';
 import { randomBytes } from 'crypto';
 import { env } from '@/app/utils/env';
 import { StoredSIWSObject } from '@/types';
+import prisma from '@/lib/prisma';
+import { generateJwtHash } from '@/lib/utils';
+import { SIWS_STORAGE_KEY } from '@/lib/consts';
 
 interface TokenPayload {
   id: string;
   wallet: string;
 }
-
-const SIWS_STORAGE_KEY = 'chakra_most_recent_siws_message';
 
 /**
  * Generates a JWT token for a user
@@ -31,7 +32,14 @@ export function generateToken(publicKey: string): string {
  */
 export async function verifyToken(request: NextRequest): Promise<TokenPayload | null> {
   const token = request.headers.get('Authorization')?.split(' ')[1];
+
   if (!token) return null;
+
+  // need to deal with old jwts where the hash was not stored
+  const jwtHash = await prisma.jwtHash.findFirst({ where: { hash: generateJwtHash(token) } });
+  if (!jwtHash) {
+    return null;
+  }
 
   try {
     const decoded = verify(token, env.JWT_SECRET) as TokenPayload;

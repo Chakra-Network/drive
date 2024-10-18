@@ -22,4 +22,5 @@ export const INTEGER_BYTE_LENGTH = 4;
 
 export const CURRENT_PRIVATE_VERSION = 2;
 
-export const LS_AUTH_TOKEN_KEY = 'auth_token';
+export const LS_AUTH_TOKEN_KEY = 'auth_token_v2';
+export const SIWS_STORAGE_KEY = 'chakra_most_recent_siws_message';
