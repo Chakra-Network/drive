@@ -10,7 +10,7 @@ import {
 } from '@/app/components/ui/dialog';
 import { ScrollArea } from '@/app/components/ui/scroll-area';
 import apiClient from '@/lib/api-client';
-import { LS_AUTH_TOKEN_KEY } from '@/lib/consts';
+import { LS_AUTH_TOKEN_KEY, SIWS_STORAGE_KEY } from '@/lib/consts';
 import { retrieveAuthToken, storeAuthToken } from '@/lib/utils';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@tiplink/wallet-adapter-react-ui';
@@ -214,6 +214,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.data.success) {
         storeAuthToken(response.data.data.token);
         localStorage.setItem('publicKey', publicKey.toBase58());
+        localStorage.removeItem(SIWS_STORAGE_KEY);
         setStatus('authenticated');
         setCurrentPublicKey(publicKey.toBase58());
         console.log('Authentication successful for public key:', publicKey.toBase58());

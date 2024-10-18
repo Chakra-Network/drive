@@ -360,7 +360,8 @@ async function fetchAndDecryptMultipartBytes(
   if (
     !signInMessage ||
     !signInMessage.issuedAt ||
-    Date.parse(signInMessage.issuedAt) < Date.now() - SIWS_MESSAGE_EXPIRATION_TIME
+    Date.parse(signInMessage.issuedAt) < Date.now() - SIWS_MESSAGE_EXPIRATION_TIME ||
+    Date.parse(signInMessage.issuedAt) < 1729280711000
   ) {
     storedSIWSObject = await requestSiwsMessage({
       publicKey,

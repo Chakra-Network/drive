@@ -45,6 +45,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
         isPrivate: file.isPrivate,
         createdAt: new Date(),
         updatedAt: new Date(),
+        privateVersion: file.privateVersion,
       },
     });
 
