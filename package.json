@@ -70,6 +70,7 @@
     "framer-motion": "^11.11.1",
     "i": "^0.3.7",
     "ipfs-only-hash": "^4.0.0",
+    "js-sha256": "^0.11.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.439.0",
     "nanoid": "^5.0.7",

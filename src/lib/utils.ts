@@ -7,7 +7,8 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/en';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import { twMerge } from 'tailwind-merge';
-import { v4 as uuidv4 } from 'uuid';
+import { sha256 } from 'js-sha256';
+import { LS_AUTH_TOKEN_KEY } from '@/lib/consts';
 
 dayjs.extend(advancedFormat);
 dayjs.locale('en');
@@ -49,18 +50,19 @@ export function formatFileName(name: string, maxSize = 30): string {
 
 export function createSiwsInput(
   publicKey: string,
-  statement: string
+  nonce: string,
+  message?: string
 ): SolanaSignInInputWithRequiredFields {
   const now = new Date();
 
   return {
     domain: 'drive.chakra.network',
     address: publicKey,
-    statement,
     uri: 'https://drive.chakra.network',
     chainId: SOLANA_MAINNET_CHAIN,
-    nonce: uuidv4(),
+    nonce,
     issuedAt: now.toISOString(),
+    statement: message,
   };
 }
 
@@ -80,4 +82,16 @@ export function getBaseUrl(): string {
     return `https://${process.env.VERCEL_URL}`;
   }
   return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+}
+
+export function generateJwtHash(jwt: string): string {
+  return sha256(jwt);
+}
+
+export function storeAuthToken(token: string) {
+  localStorage.setItem(LS_AUTH_TOKEN_KEY, token);
+}
+
+export function retrieveAuthToken(): string | null {
+  return localStorage.getItem(LS_AUTH_TOKEN_KEY);
 }

@@ -108,11 +108,11 @@ export function isValidSolanaPublicKey(value: string): boolean {
   }
 }
 
-export function storeSIWSMessage(siwsObject: StoredSIWSObject) {
+export function storeSIWSMessageWithNonce(siwsObject: StoredSIWSObject) {
   localStorage.setItem(SIWS_STORAGE_KEY, JSON.stringify(siwsObject));
 }
 
-export function retrieveStoredSIWSMessage(): StoredSIWSObject | null {
+export function retrieveStoredSIWSMessageWithNonce(): StoredSIWSObject | null {
   const siwsMessage = localStorage.getItem(SIWS_STORAGE_KEY);
   if (!siwsMessage) return null;
   return JSON.parse(siwsMessage);

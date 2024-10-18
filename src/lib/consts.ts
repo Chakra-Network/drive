@@ -20,4 +20,6 @@ export const LIT_NETWORK = LitNetwork.Datil;
 
 export const INTEGER_BYTE_LENGTH = 4;
 
-export const CURRENT_PRIVATE_VERSION = 1;
+export const CURRENT_PRIVATE_VERSION = 2;
+
+export const LS_AUTH_TOKEN_KEY = 'auth_token';

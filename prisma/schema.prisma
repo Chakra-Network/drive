@@ -85,3 +85,17 @@ model Purchase {
 
   @@index([userPK])
 }
+
+model EncryptionNonce {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+}
+
+model JwtHash {
+  id        String   @id @default(uuid())
+  hash      String
+  publicKey String
+  createdAt DateTime @default(now())
+
+  @@index([hash, publicKey])
+}

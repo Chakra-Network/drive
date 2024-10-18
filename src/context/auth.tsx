@@ -10,6 +10,8 @@ import {
 } from '@/app/components/ui/dialog';
 import { ScrollArea } from '@/app/components/ui/scroll-area';
 import apiClient from '@/lib/api-client';
+import { LS_AUTH_TOKEN_KEY } from '@/lib/consts';
+import { retrieveAuthToken, storeAuthToken } from '@/lib/utils';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useWalletModal } from '@tiplink/wallet-adapter-react-ui';
 import { Loader2 } from 'lucide-react';
@@ -136,7 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   const checkAuthStatus = useCallback(async () => {
-    const token = localStorage.getItem('authToken');
+    const token = retrieveAuthToken();
     const storedPublicKey = localStorage.getItem('publicKey');
 
     if (token && storedPublicKey && publicKey && storedPublicKey === publicKey.toBase58()) {
@@ -158,7 +160,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [publicKey]);
 
   const logout = useCallback(() => {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem(LS_AUTH_TOKEN_KEY);
     localStorage.removeItem('publicKey');
     setStatus('unauthenticated');
     setCurrentPublicKey(null);
@@ -189,8 +191,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const storedSIWSObject = await requestSiwsMessage(publicKey, signMessage, () => {
-        setAuthError('Failed to authenticate, no signature found');
+      const storedSIWSObject = await requestSiwsMessage({
+        publicKey,
+        signMessage,
+        onSignFailed: () => {
+          setAuthError('Failed to authenticate, no signature found');
+        },
+        isForLitDecryption: false,
       });
 
       if (!storedSIWSObject) {
@@ -205,7 +212,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (response.data.success) {
-        localStorage.setItem('authToken', response.data.data.token);
+        storeAuthToken(response.data.data.token);
         localStorage.setItem('publicKey', publicKey.toBase58());
         setStatus('authenticated');
         setCurrentPublicKey(publicKey.toBase58());
@@ -256,7 +263,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [status, authError, loading, currentPublicKey, triggerAuth, logout]
   );
 
-  const connectedButNotAuthenticated = connected && status === 'unauthenticated';
+  const connectedButNotAuthenticated = useMemo(
+    () => connected && status === 'unauthenticated',
+    [connected, status]
+  );
 
   return (
     <AuthContext.Provider value={contextValue}>

@@ -1,5 +1,5 @@
 import axios, { AxiosHeaders, InternalAxiosRequestConfig } from 'axios';
-import { getBaseUrl } from './utils';
+import { getBaseUrl, retrieveAuthToken } from './utils';
 
 const isServer = typeof window === 'undefined';
 const baseUrl = getBaseUrl();
@@ -14,7 +14,7 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     config.headers instanceof AxiosHeaders ? config.headers : new AxiosHeaders(config.headers);
 
   if (!isServer) {
-    const token = localStorage.getItem('authToken');
+    const token = retrieveAuthToken();
     const walletAddress = localStorage.getItem('walletAddress');
 
     if (token) {
@@ -57,7 +57,6 @@ const fileentryApi = {
 // User API methods
 const userApi = {
   login: (data: any) => api.post('/user/login', data),
-  register: (data: any) => api.post('/user', data),
   verify: () => api.get('/user/verify'),
   getStorage: () => api.get('/user/storage'),
 };
