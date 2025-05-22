@@ -35,7 +35,7 @@ Before you begin, ensure you have the following installed:
 1. Clone the repository:
 
    ```
-   git clone https://github.com/yourusername/chakra-drive.git
+   git clone https://github.com/yourusername/chakra-drive
    cd chakra-drive
    ```
 
